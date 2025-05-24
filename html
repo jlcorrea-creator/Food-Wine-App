@@ -1,0 +1,2988 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Jerry's Food & Wine App</title>
+  
+  <link rel="icon" href="https://cdn.glitch.global/a1542506-b096-4700-ba35-f7cd2852e4fd/favicon.svg?v=1733850980428" type="image/svg+xml">
+  <!-- Optionally, link to the manifest file -->
+  <link rel="manifest" href="/manifest.json">
+  <!-- Other meta tags, CSS links, etc. -->
+  <meta name="description" content="A web app to help you pair wines with food">
+</head> 
+  <style>      
+    /* Styles for the page */
+    body {
+      font-family: Arial, sans-serif;
+      background-color: black;
+      color: white;
+      padding: 50px;
+    } 
+    /* Generic-Modal Styles */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      padding-top: 60px;
+    }
+
+    .modal-content {
+      background-color: #fefefe;
+      margin: 5% auto;
+      padding: 20px;
+      border: 1px solid #888;
+      width: 80%;
+      max-width: 600px;
+      color: black;
+      border-radius: 8px;
+      max-height: 70vh; /* Limits the modal's height */
+      overflow-y: auto; /* Adds vertical scrollbar when content overflows */
+      overflow-x: hidden; /* Prevents horizontal scroll */
+      scroll-behavior: smooth; /* Smooth scrolling */
+    }
+    .winemodal-content {
+      float:right;
+      background-color: #fefefe;
+      margin: 5% auto;
+      padding: 20px;
+      border: 1px solid #888;
+      width: 80%;
+      max-width: 300px;
+      color: black;
+      border-radius: 8px;
+      max-height: 70vh; /* Limits the modal's height */
+      overflow-y: auto; /* Adds vertical scrollbar when content overflows */
+      overflow-x: hidden; /* Prevents horizontal scroll */
+      scroll-behavior: smooth; /* Smooth scrolling */
+    }
+    /* Modal Styles */
+    .modalinfo {
+      display: none;
+      position: fixed;
+      z-index: 10;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background-color: rgba(0,0,0,0.4);
+    }
+    .info-button:hover {
+      background-color: #a00000a4;
+       color: rgba(255, 255, 255, 0.438);
+    }
+
+    select {
+      margin-bottom: 20px;
+      padding: 5px;
+      font-size: 1em;
+    }
+
+    .category {
+      border: .5px solid #727171;
+      background: #fff;
+      padding: 2px;
+    }
+
+    .category h2{
+      cursor: pointer;
+      margin: 0;
+      font-size: 1.2em;
+      background-color: #a79b9b;
+      padding: 5px;
+    }
+
+    .terms {
+      display: none;
+      padding: 10px;
+    }
+
+    .term {
+      padding: 5px 0;
+    }
+
+    .translation {
+      font-weight: bold;
+    }
+
+    em {
+      color: #555;
+    }
+    .close-term {
+            color: transparent;
+            float: right;
+            font-size: 30px;
+            font-weight: bold;
+    }
+    /* Wine List button */
+    .explore-container {
+      position: absolute;
+      top: 25px;
+      right: 80px;
+      background-color: rgba(255, 255, 255, 0.2); /* Transparent background */
+      padding: 10px 20px;
+      border-radius: 8px;
+      z-index: 10; /* Ensure it stays on top of other content */
+      transition: background-color 0.3s ease;
+    }
+    .explore-link {
+      color: white;
+      font-size: 1.2em;
+      font-weight: bold;
+      text-decoration: none;
+    }
+    .explore-container:hover {
+      background-color: rgba(255, 255, 255, 0.4); /* Light up on hover */
+    }
+    .explore-container:hover .explore-link {
+      color: #ff6347; /* Change text color on hover */
+    }
+     /* Style for clickable Wine categories */
+    .category-link {
+      cursor: pointer;
+      color: #000000;
+      font-weight: bold;
+      text-decoration: underline;
+    }
+    .category-link:hover {
+      color: #960707;
+    }
+      /* Image */
+    header {
+      display: flex;
+      background-image: url("https://cdn.glitch.me/a1542506-b096-4700-ba35-f7cd2852e4fd/Orange%20Yellow%20Green%20Colorful%20Summer%20Beach%20Party%20Banner%20(1).png?v=1731581604018");
+      background-size: cover;
+      background-position: center;
+      border-radius: 8px;
+      height: 600px;
+      margin: 20px;
+    }
+    /* Feature Guide Button */
+    .dropdown-btn {
+      background-color: rgba(255, 255, 255, 0.2); /* Transparent background */
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      font-size: 1.2em;
+      font-weight: bold;
+      cursor: pointer;
+      border-radius: 5px;
+      transition: background-color 0.3s ease;
+    }
+    .dropdown-btn:hover {
+      background-color: rgba(255, 255, 255, 0.4); /* Light up on hover */
+      color: #ff6347; /* Change text color on hover */
+    }
+    .dropdown-modal {
+      display: none;
+      position: fixed;
+      z-index: 1001;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.589);
+      padding-top: 60px;
+    }
+    /* Modals close button styling */
+    .close-btn {
+      color: #aaa;
+      float: right;
+      font-size: 28px;
+      font-weight: bold;
+    }
+    .close-btn:hover,
+    .close-btn:focus {
+      color: black;
+      text-decoration: none;
+      cursor: pointer;
+    }
+    
+    h2 {
+      text-align: center;
+    }
+
+    /* For screens smaller than 768px (e.g., tablets, mobile phones) */
+    @media (max-width: 768px) {
+      header {
+        height: 400px; /* Reduce the height on smaller screens */
+        margin: 10px; /* Adjust margin for smaller screens */
+      }
+    }
+
+    .search-container {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    input[type="text"],
+    select {
+      padding: 10px;
+      font-size: 1.1em;
+      width: 500px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+    /* Search And Find */
+    button {
+      padding: 10px 20px;
+      font-size: 1.2em;
+      background-color: rgb(116, 3, 3);
+      color: rgb(253, 252, 252);
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: background-color 0.3s ease;
+    }
+   
+    button:hover {
+      background-color: rgb(122, 105, 105);
+       color: rgb(0, 0, 0);
+    }  
+    .result-container {
+      margin-top: 20px;
+      padding: 20px;
+      background-color:rgba(95, 90, 90, 0.301); 
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      text-align: center;
+      color: #ff6347;
+    }
+    .button-social {
+      background-color: #007BFF;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      cursor: pointer;
+      margin: 5px;
+      font-size: 16px;
+    }
+    .button-social:hover {
+      background-color: #0056b3;
+    }
+    footer {
+      text-align: center;
+      margin-top: 50px;
+      font-size: 0.9em;
+    }
+    
+    /* Accept button styling */
+    .accept-button,.buy-link {
+      padding: 10px 20px;
+      background-color: rgba(255, 255, 255, 0.2); 
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      text-decoration: none;
+    }
+
+    .accept-button:hover {
+      background-color: rgba(255, 255, 255, 0.4); 
+    }
+
+    .buy-link:hover {
+      background-color: #4bb650;
+    }    
+    /* Link styling */
+    .red-link {
+      color: #920808; /* Sets the link color */
+      font-weight: bold; /* Makes the text bold */
+    }
+
+    .red-link:hover {
+      color: #ee0585;  /* Color when the link is hovered */
+      text-decoration: underline; /* Optional: underline on hover */
+    }
+     /* Link styling */
+    .white-link {
+      color: #11a011; /* Sets the link color */
+      font-weight: bold; /* Makes the text bold */
+    }
+
+    .white-link:hover {
+      color: #19ce19; /* Color when the link is hovered */
+      text-decoration: underline; /* Optional: underline on hover */
+    }
+    
+    .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+    }
+
+    .close:hover,
+    .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+    }
+    
+    .adsense {
+      text-align: center;
+      margin-top: 20px;
+      margin-bottom: 20px;
+      background-color:#0f0f0f54;
+      border-radius: 5px;
+    }
+    
+   </style>
+  <body>
+   
+  <iframe src="https://ep2.adtrafficquality.google/sodar/sodar2/232/runner.html" width="0" height="0" style="display: none;" aria-hidden="true" title="Ad Traffic Quality"></iframe>
+  <iframe src="https://www.google.com/recaptcha/api2/aframe" width="0" height="0" style="display: none;" aria-hidden="true" title="Google Recaptcha"></iframe>
+  <iframe id="google_esf" name="google_esf" src="https://googleads.g.doubleclick.net/pagead/html/r20241120/r20190131/zrt_lookup_fy2021.html" style="display: none;" aria-hidden="true" title="Google Ads"></iframe>
+
+  <div class="explore-container" id="exploreButton">
+    <span class="explore-link">Wine List</span>
+  </div>
+
+   <!-- Modal for Terms and Conditions -->
+   <div id="termsModal" class="modal">
+   <div class="modal-content">
+   <span class="close-term" id="closeModal">&times;</span>
+   
+   <h1>User Agreement</h1>
+===============================================================
+   <div class="section">
+   <p><strong>Last Updated: November 2024</strong></p>
+   <p>
+   By using the <strong>Food and Wine Pairing</strong> app (the "App"),
+   the user agrees to the following <strong>User Agreement</strong> and
+   <strong>Privacy Policy</strong>. Please read them carefully.
+   </p>
+
+   <h2>Terms of Use</h2>
+   <ul>
+    <li>
+     <strong>Personal Use Only</strong>: The app is for personal,
+     non-commercial use. The content is for informational purposes
+     only. Users are responsible for any personal health decisions.
+    </li>
+    <li>
+     <strong>User Responsibilities</strong>: Users are responsible
+     for providing accurate information and using the app in
+     compliance with applicable laws. The app must not be used for
+     any illegal activities or in any manner that harms others.
+    </li>
+   <li>
+     <strong>Intellectual Property</strong>: All content within the
+     app, including text, images, logos, and software, is protected
+     by intellectual property laws. Unauthorized use, copying,
+     modification, or distribution of the content is prohibited.
+   </li>
+ </ul>
+
+ <h2>Privacy Policy</h2>
+ <h3>Data Collection</h3>
+ <ul>
+   <li>
+  <strong>Personal Information</strong>: Personal details such as your name, email address, 
+   and any other information you voluntarily provide when using features like saving pairings,
+   sending messages, or contacting support may be collected.
+</li>
+
+   <li>
+     <strong>Usage Data</strong>: Information automatically collected
+     about app usage, such as device type, IP address, and user
+     activity (e.g., searches, page views).
+   </li>
+ </ul>
+
+ <h3>How Data Is Used</h3>
+ <ul>
+   <li>To improve the functionality and performance of the app.</li>
+   <li>
+     To personalize the user experience, including offering relevant
+     content.
+   </li>
+   <li>
+     To send updates, notifications, or offers (only if the user
+     opts-in).
+   </li>
+   <li>
+     To comply with legal obligations and protect the rights of
+     users.
+   </li>
+ </ul>
+
+ <h3>User Rights</h3>
+ <ul>
+   <li>
+     Users may request access to, correction of, or deletion of their
+     personal data.
+   </li>
+   <li>
+     Users can opt-out of marketing communications at any time.
+   </li>
+ </ul>
+
+ <h3>Data Security</h3>
+ <p>
+   Reasonable measures are taken to protect user data, but no system
+   can guarantee 100% security. Users are encouraged to secure their
+   accounts and devices.
+ </p>
+
+ <h2>Donations</h2>
+ <p>
+   The <strong>Food and Wine Pairing</strong> app is free to use, and
+   donations from users help maintain and improve the service. Donations are optional and voluntary, and users are not required to contribute in order to use the app.
+ </p>
+ <p>
+   Donations made through the app are securely processed by third-party payment providers, such as PayPal. Users should refer to PayPal's <a href="https://www.paypal.com/legal">terms and conditions</a> for more details about payment processing and security.
+ </p>
+ <p>
+   Donations are used exclusively to maintain and improve the app, including covering costs such as server hosting, ongoing app development, feature updates, and customer support.
+ </p>
+ <h2>Donation Refund Policy</h2>
+ <p>
+   All donations made through the app are non-refundable. By making a donation, users acknowledge that the transaction is final, and no refunds will be provided.
+ </p>
+
+ <h2>Limitation of Liability</h2>
+ <p>
+   The app is provided "as is" and without warranties. There is no
+   guarantee regarding the accuracy, completeness, or reliability of
+   the content. The app's owner is not liable for any damages arising
+   from the use or inability to use the app.
+ </p>
+
+ <h2>Governing Law</h2>
+ <p>
+   This User Agreement is governed by the laws of
+   <strong>The Philippines</strong>. Any disputes will be resolved
+   under the jurisdiction of the courts in
+   <strong>Pasay City</strong>.
+ </p>
+
+ <h2>Changes to This Policy</h2>
+ <p>
+   This User Agreement and the Privacy Policy may be updated
+   periodically. Any changes will be posted here with a revised "Last
+   Updated" date.
+ </p>
+
+ <h2>Contact Information</h2>
+ <p>
+   If there are any questions about this User Agreement or the Privacy
+   Policy, users can contact:
+ </p>
+ <p>
+   <strong>Email</strong>:
+   <a href="mailto:[jerrylimcorrea@gmail.com]">jerrylimcorrea@gmail.com</a><br />
+   <strong>Phone</strong>: +639951291344
+ </p>
+
+ <h2>Agreeing to Terms</h2>
+ <p>
+   By clicking "I Agree," users acknowledge that they have read and
+   accept this <strong>User Agreement</strong> and
+   <strong>Privacy Policy</strong>.
+ </p>
+</div>
+
+<button class="accept-button" id="acceptButton">I Agree</button>
+</div>
+</div>
+
+  <header> 
+   <div id="exploreModal" class="modal">
+    <div class="winemodal-content">
+    <span class="close-btn">&times;</span>         
+
+    <h2>Welcome to the World of Wines!</h2>
+===============================
+      <!-- Clickable Categories -->
+    <h3 class="category-link" onclick="openModal('sparklingWines')">Sparkling Wines</h3>
+    <h3 class="category-link" onclick="openModal('whiteWines')">White Wines</h3>
+    <h3 class="category-link" onclick="openModal('roseWines')">Rosé Wines</h3>
+    <h3 class="category-link" onclick="openModal('redWines')">Red Wines</h3>
+    <h3 class="category-link" onclick="openModal('dessertWines')">Dessert Wines</h3>
+    <h3 class="category-link" onclick="openModal('winesByRegion')">Wines by Region</h3>
+    <h3 class="category-link" onclick="openModal('glossary')">Glossary of Wine Terms</h3>
+    <h3 class="category-link" onclick="openModal('foodPairing')">Wine & Food Pairing Basics</h3>
+===============================      
+      <p>Click on the<a href="https://www.example.com" class="red-link" target="_blank">RED</a>to visit a website.</p>
+      <p> Click on the <a href="https://www.example.com" class="white-link" target="_blank">WHITE</a>to visit a website.</p>           
+    </div>
+  </div>
+
+  <!-- Modal -->
+<div id="wineModal" class="modal">
+  <div class="modal-content">
+    <span class="close-btn" onclick="closeWineModal()">&times;</span>
+    <div id="sparklingWines" class="modal-section">
+      <h2>Sparkling Wines</h2>
+        <h3>Champagne (France)</h3>
+        <ul>
+        <li><strong>Non-Vintage Brut:</strong> Crisp, dry, citrus, green apple, toasty notes.</li>
+        <li><strong>Vintage Champagne:</strong> Complex, rich, made from a single exceptional year.</li>
+        <li><strong>Rosé Champagne:</strong> Elegant with strawberry and raspberry notes.</li>
+        <li><strong>Blanc de Blancs:</strong> 100% Chardonnay, zesty and light.</li>
+        <li><strong>Blanc de Noirs:</strong> Fuller-bodied, red fruit and brioche.</li>
+      </ul>
+        <h3>Prosecco (Italy)</h3>
+      <ul>
+        <li><strong>Extra Dry:</strong> Slightly sweet, pear, apple, floral.</li>
+        <li><strong>Brut:</strong> Drier, with green apple and citrus notes.</li>
+      </ul>
+        <h3>Cava (Spain)</h3>
+      <ul>
+        <li><strong>Brut:</strong> Lemon zest, almond, green apple.</li>
+        <li><strong>Reserva/Gran Reserva:</strong> More complex, nutty and toasty.</li>
+      </ul>
+        <h3>Other Sparkling Wines</h3>
+      <ul>
+        <li><strong>Franciacorta (Italy):</strong> Traditional-method with fine bubbles.</li>
+        <li><strong>Crémant (France):</strong> Affordable alternative, light and fruity.</li>
+      </ul>
+    </div>
+    <div id="whiteWines" class="modal-section">
+      <h2>White Wines</h2>
+        <h3>Light-Bodied Whites</h3>
+      <ul>
+        <li><strong>Sauvignon Blanc:</strong> Citrus, grassy, minerally (France/NZ).</li>
+        <li><strong>Pinot Grigio:</strong> Lemon, lime, green apple (Italy).</li>
+        <li><strong>Albariño:</strong> Peach, citrus, slight salinity (Spain).</li>
+        <li><strong>Vermentino:</strong> Herbal, citrusy (Italy).</li>
+      </ul>
+        <h3>Medium-Bodied Whites</h3>
+      <ul>
+        <li><strong>Chenin Blanc:</strong> Apple, floral or tropical (France/SA).</li>
+        <li><strong>Grüner Veltliner:</strong> Citrus, white pepper (Austria).</li>
+        <li><strong>Soave (Garganega):</strong> Almond, pear, floral (Italy).</li>
+      </ul>
+        <h3>Full-Bodied Whites</h3>
+      <ul>
+        <li><strong>Chardonnay:</strong> Citrus to tropical, oaky and buttery (France/USA).</li>
+        <li><strong>Viognier:</strong> Peach, apricot, floral.</li>
+        <li><strong>Roussanne/Marsanne:</strong> Honeyed, nutty, stone fruit (France).</li>
+      </ul>
+    </div>
+    <div id="roseWines" class="modal-section">
+      <h2>Rosé Wines</h2>
+        <h3>Styles by Region</h3>
+      <ul>
+        <li><strong>Provence Rosé (France):</strong> Pale, dry, strawberry, citrus, herbs.</li>
+        <li><strong>Spanish Rosado:</strong> Bold, cherry, strawberry, spice.</li>
+        <li><strong>Italian Rosato:</strong> Cherry, watermelon, herbal.</li>
+        <li><strong>Tavel Rosé (France):</strong> Full-bodied, red berries, spice.</li>
+        <li><strong>California Rosé:</strong> Raspberry, watermelon, floral.</li>
+      </ul>
+    </div>
+    <div id="redWines" class="modal-section">
+      <h2>Red Wines</h2>
+        <h3>Light-Bodied Reds</h3>
+      <ul>
+        <li><strong>Pinot Noir:</strong> Cherry, cranberry, earthy (France, Oregon).</li>
+        <li><strong>Gamay:</strong> Red berries, juicy, soft tannins (Beaujolais).</li>
+      </ul>
+        <h3>Medium-Bodied Reds</h3>
+      <ul>
+        <li><strong>Merlot:</strong> Black cherry, mocha, soft (France/USA).</li>
+        <li><strong>Sangiovese:</strong> Cherry, herbs, tomato leaf (Italy).</li>
+        <li><strong>Zinfandel:</strong> Jammy, blackberry, cinnamon (USA).</li>
+        <li><strong>Grenache/Garnacha:</strong> Raspberry, spice, pepper (Spain/Rhône).</li>
+      </ul>
+        <h3>Full-Bodied Reds</h3>
+      <ul>
+        <li><strong>Cabernet Sauvignon:</strong> Blackberry, cassis, oak (USA/France).</li>
+        <li><strong>Syrah/Shiraz:</strong> Plum, pepper, chocolate (France/Australia).</li>
+        <li><strong>Malbec:</strong> Black cherry, cocoa, juicy (Argentina).</li>
+        <li><strong>Tempranillo:</strong> Dried cherry, leather, tobacco (Spain).</li>
+        <li><strong>Petite Sirah:</strong> Blueberry, pepper, intense tannins (USA).</li>
+      </ul>
+  </div>
+    <div id="dessertWines" class="modal-section">
+    <h2>Dessert Wines</h2>
+        <h3>***Sweet White Wines (Dessert Wines)***</h3>
+        <h4>Late Harvest Wines:</h4>
+      <ul>
+        <li><strong>Late Harvest Riesling:</strong> Sweet with apricot, peach, and honey flavors.</li>
+        <li><strong>Late Harvest Chenin Blanc:</strong> Rich, honeyed flavors with notes of citrus and pear.</li>
+      </ul>
+        <h4>Noble Rot (Botrytized Wines):</h4>
+      <ul>
+        <li><strong>Sauternes (France):</strong> Rich and complex, with flavors of honey, apricot, and orange marmalade.</li>
+        <li><strong>Tokaji (Hungary):</strong> Sweet with vibrant acidity, flavors of honey, orange, and nuts.</li>
+        <li><strong>Beerenauslese (Germany):</strong> Lush and sweet, made from overripe, botrytized grapes, typically Riesling.</li>
+      </ul>
+        <h4>Muscat/Moscato:</h4>
+      <ul>
+        <li><strong>Moscato d'Asti (Italy):</strong> Lightly sparkling with peach, apricot, and floral notes.</li>
+        <li><strong>Muscat Beaumes-de-Venise (France):</strong> Sweet, with flavors of orange blossom, peach, and spice.</li>
+      </ul>
+        <h4>Other Sweet Wines:</h4>
+      <ul>
+        <li><strong>Vin Santo (Italy):</strong> Sweet, nutty, and raisiny, often paired with biscotti.</li>
+        <li><strong>Ice Wine (Canada, Germany):</strong> Intensely sweet with fruity flavors of peach, honey, and citrus.</li>
+      </ul>
+      <h3>***Fortified Wines***</h3>
+        <h4>Port:</h4>
+      <ul>
+        <li><strong>Ruby Port:</strong> Sweet, full-bodied, dark berry flavors.</li>
+        <li><strong>Tawny Port:</strong> Aged longer, with flavors of dried fruits, caramel, and nuts.</li>
+        <li><strong>Vintage Port:</strong> Rich and complex with tannic structure.</li>
+        <li><strong>LBV Port:</strong> Aged before bottling, with a smoother finish.</li>
+      </ul>
+        <h4>Sherry:</h4>
+      <ul>
+        <li><strong>Pedro Ximénez (PX):</strong> Extremely sweet with raisiny, fig, and molasses flavors.</li>
+        <li><strong>Cream Sherry:</strong> Sweetened Oloroso, with nutty and dark fruit flavors.</li>
+        <li><strong>Amontillado:</strong> Medium-sweet with nuts, dried fruits, and caramel.</li>
+        <li><strong>Fino:</strong> Dry, sometimes paired with nutty or citrus desserts.</li>
+      </ul>
+        <h4>Madeira:</h4>
+      <ul>
+        <li><strong>Malmsey Madeira:</strong> The sweetest style, rich with caramel, nuts, and dried fruits, great for nut-based and rich cakes.</li>
+        <li><strong>Bual Madeira:</strong> Sweet and full-bodied, with rich flavors of caramel and nuts, ideal for dark chocolate desserts.</li>
+        <li><strong>Rainwater Madeira:</strong> Medium dry to medium sweet, with light citrus and nutty flavors, pairing well with citrus desserts.</li>
+      </ul>
+      <h3>***Other Sweet Wines***</h3>
+      <ul>
+        <li><strong>Marsala (Italy):</strong> A fortified wine often used for cooking, but also available in a sweet style. It has flavors of caramel, vanilla, and dried fruit, great for tiramisu or fruit cakes.</li>
+        <li><strong>Sherry (Sweet)</strong> Cream Sherry or PX Sherry are both excellent choices for very sweet and rich desserts.</li>
+        <li><strong>Vermouth:</strong> Fortified and aromatized; sweet or dry, with complex flavors that pair well with a range of dishes.</li>
+      </ul>
+      <h3>***Other Dessert Wines***</h3>
+      <ul>
+        <li><strong>Madeira:</strong> A fortified wine from the Madeira Islands, it comes in varying degrees of sweetness:</li>
+        <ul><strong>Malmsey:</strong> Sweet, perfect with rich, nutty, or caramel-based desserts.</ul>
+        <ul><strong>Bual:</strong> Rich, with dark fruit and caramel flavors, it pairs well with spice cakes and chocolate.</ul>
+      </ul>
+    </div>
+    <div id="winesByRegion" class="modal-section">
+    <h2>Wines by Region</h2>
+      <h3>France</h3>
+      <ul>
+        <li><strong>Bordeaux:</strong> Known for its Cabernet Sauvignon, Merlot, and Sauvignon Blanc wines.</li>
+        <li><strong>Burgundy:</strong> Famous for Pinot Noir and Chardonnay wines.</li>
+        <li><strong>Loire Valley:</strong> A variety of wines, including Sauvignon Blanc, Chenin Blanc, and Cabernet Franc.</li>
+        <li><strong>Rhône Valley:</strong> Known for Syrah, Grenache, and Châteauneuf-du-Pape wines.</li>
+        <li><strong>Champagne:</strong> Famous for its sparkling wines made from Chardonnay, Pinot Noir, and Pinot Meunier grapes.</li>
+      </ul>
+      <h3>Italy</h3>
+      <ul>
+        <li><strong>Tuscany:</strong> Renowned for Chianti, Sangiovese, and Super Tuscan wines.</li>
+        <li><strong>Piedmont:</strong> Famous for Barolo and Barbaresco, made from the Nebbiolo grape.</li>
+        <li><strong>Veneto:</strong> Known for Prosecco, Amarone, and Soave wines.</li>
+        <li><strong>Sicily:</strong> Known for Marsala, Nero d'Avola, and other regional varieties.</li>
+      </ul>
+      <h3>Spain</h3>
+      <ul>
+        <li><strong>Rioja:</strong> Famous for its Tempranillo-based wines, both red and white.</li>
+        <li><strong>Priorat:</strong> Known for full-bodied reds made from Garnacha and Cariñena.</li>
+        <li><strong>Rías Baixas:</strong> Famous for Albariño, a refreshing white wine with citrus and floral notes.</li>
+      </ul>
+      <h3>Germany</h3>
+      <ul>
+        <li><strong>Mosel:</strong> Known for its Riesling wines, ranging from dry to sweet.</li>
+        <li><strong>Rheingau:</strong> Famous for its high-quality Riesling and Spätburgunder (Pinot Noir).</li>
+      </ul>
+      <h3>USA</h3>
+      <ul>
+        <li><strong>Napa Valley:</strong> Famous for Cabernet Sauvignon, Merlot, and Chardonnay wines.</li>
+        <li><strong>Sonoma:</strong> Known for a range of varieties including Pinot Noir, Chardonnay, and Zinfandel.</li>
+        <li><strong>Willamette Valley:</strong> Renowned for its Pinot Noir and other cool-climate varietals.</li>
+      </ul>
+      <h3>Australia</h3>
+      <ul>
+        <li><strong>Barossa Valley:</strong> Known for Shiraz, Cabernet Sauvignon, and Grenache.</li>
+        <li><strong>McLaren Vale:</strong> Famous for Shiraz, Grenache, and other Mediterranean varieties.</li>
+      </ul>
+      <h3>New Zealand</h3>
+      <ul>
+        <li><strong>Marlborough:</strong> Famous for Sauvignon Blanc, Pinot Noir, and Pinot Gris.</li>
+      </ul>
+      <h3>Argentina</h3>
+      <ul>
+        <li><strong>Mendoza:</strong> Known for Malbec, as well as Cabernet Sauvignon and Torrontés wines.</li>
+      </ul>
+      <h3>Chile</h3>
+      <ul>
+        <li><strong>Maipo Valley:</strong> Famous for Cabernet Sauvignon, Merlot, and Carmenère.</li>
+      </ul>
+      <h3>South Africa</h3>
+      <ul>
+        <li><strong>Stellenbosch:</strong> Renowned for Cabernet Sauvignon, Shiraz, and Chenin Blanc.</li>
+      </ul>
+    </div>
+    <div id="glossary" class="modal-section">
+      <h2>Glossary of Wine Terms</h2>
+      <ul>
+        <li><strong>Tannin:</strong> A compound found in grape skins, seeds, and stems that gives wine its dry, astringent feeling.</li>
+        <li><strong>Acidity:</strong> The tartness or freshness in wine, which helps balance sweetness and adds to the overall crispness.</li>
+        <li><strong>Body:</strong> The weight or fullness of the wine, ranging from light to full-bodied, based on alcohol, tannins, and acidity.</li>
+        <li><strong>Terroir:</strong> The unique combination of soil, climate, and grape variety that gives wine its distinct character.</li>
+        <li><strong>Vintage:</strong> The year the grapes were harvested and made into wine.</li>
+        <li><strong>Varietal:</strong> Wine made from one type of grape, like Cabernet Sauvignon or Chardonnay.</li>
+        <li><strong>Blend:</strong> A wine made from more than one type of grape.</li>
+        <li><strong>Old World:</strong> European wine regions (e.g., France, Italy, Spain).</li>
+        <li><strong>New World:</strong> Non-European wine regions (e.g., USA, Australia, Chile).</li>
+        <li><strong>Oak Aging:</strong> The process of aging wine in oak barrels, which can add flavors like vanilla, spice, and toastiness.</li>
+      </ul>
+    </div>
+    <div id="foodPairing" class="modal-section">
+      <h2>Wine & Food Pairing Basics</h2>
+      <ul>
+        <li><strong>Red Meat:</strong> Cabernet Sauvignon, Syrah, Malbec</li>
+        <li><strong>Poultry:</strong> Pinot Noir, Chardonnay</li>
+        <li><strong>Seafood:</strong> Sauvignon Blanc, Albariño</li>
+        <li><strong>Spicy Dishes:</strong> Riesling, Gewürztraminer</li>
+        <li><strong>Desserts:</strong> Port, Sauternes, Ice Wine</li>
+      </ul>
+    </div></div></div><div> 
+      <!-- Buttons -->
+  <button class="info-button" id="openModalBt">French Wine Terminology</button>
+  <button class="info-button" id="openCookingModalBt">French Culinary Terms</button>
+
+  <!-- Wine Modal -->
+  <div id="infoModal" class="modalinfo">
+    <div class="modal-content">
+      <span class="close" id="closeModalBt">&times;</span>
+      <label for="voiceSelect"><strong>Select French Voice:</strong></label><br>
+      <select id="voiceSelect"></select>
+      <div id="categories-container"></div>
+    </div>
+  </div>
+
+  <!-- Cooking Modal -->
+  <div id="cookingModal" class="modalinfo">
+    <div class="modal-content">
+      <span class="close" id="closeCookingModalBt">&times;</span>
+      <label for="cookingVoiceSelect"><strong>Select French Voice:</strong></label><br>
+      <select id="cookingVoiceSelect"></select>
+      <div id="cooking-terms-container"></div>
+    </div>
+  </div>
+</div>
+  </header>
+<main>
+     <!-- Dropdown button -->
+    <button id="dropdownBtn" class="dropdown-btn">Feature Guide</button>
+
+     <!-- Feature Guide Modal (hidden by default) -->
+    <div id="dropdownModal" class="dropdown-modal">
+      <div class="modal-content">
+        <span class="close-btn" id="closeBtn">&times;</span>         
+        
+    <h1>Food & Wine Pairing: Quick Guide</h1>
+===============================================================
+       <h2>Follow these simple steps:</h2>
+<ul>
+  <li>
+    <strong>Enter a food item</strong> -Select from the dropdown list
+    or type an item to use the TAB completion and auto-suggest feature
+    (e.g., 'game').
+  </li>
+  <li>
+    <strong>Select from a pop-up box</strong> - Choose whether it is a dish type, preparation, doneness, sauce, etc.
+  </li>
+  <li>
+    <strong>Select Type of Wine</strong> - Pick Red, White, Rosé, etc.
+  </li>
+  <li>
+    <strong>Select Wine Region</strong> - Choose from Old-World or
+    New-World.
+  </li>
+  <li>
+    <strong>Click 'Find Wine Pairing' button</strong> - The app will
+    suggest wines that match.
+  </li>
+  <li>
+    <strong>Click 'Save this Pairing' button</strong> - Optional.
+  </li>
+  <li>
+    <strong>Click 'Buy this wine' button</strong> - Pick your wine and
+    get redirected to a wine store to purchase.
+  </li>
+</ul>
+        
+<h2>Key Terms:</h2>
+<ul>
+  <li>
+    <strong> Game Meat (Wild Game):</strong>
+    <p> - Wild animals that are
+    hunted for food, rather than raised on farms. e.g: Venison (deer),
+    wild boar, pheasant, duck, rabbit, and other wild birds or
+    animals.
+  <li>
+    <strong>Old-World:</strong>
+    <p>- Refers to wines made in traditional
+    wine regions of Europe (e.g., France, Italy, Spain). Typically,
+    these wines have a more restrained, earthy, and less fruit-forward
+    style.</p>
+  </li>
+  <li>
+    <strong>New-World:</strong>
+    <p> - Wines made in regions outside of
+    Europe, such as the United States, Australia, South America, and
+    South Africa. New-World wines are often more fruit-forward and
+    bold compared to Old-World wines.
+  <li>
+   <strong>Bordeaux Blend:</strong>
+   <p>- Refers to a wine made with a blend of grape varieties that are typically associated with the Bordeaux region in France.
+     These wines are often made from a combination of Cabernet Sauvignon, Merlot, Cabernet Franc, Petit Verdot, and Malbec (for reds) or Sauvignon Blanc, Sémillon, and Muscadelle (for whites).
+   </p>
+   <p>- The Bordeaux Blend is a signature style in the region, 
+    where different grape varieties are mixed to balance the flavors, tannins, and acidity.
+   </p>
+   <p>- While the term "Bordeaux Blend" is most commonly used for wines from the Bordeaux region, it is also used globally to refer to blends made with these classic grape varieties, 
+     particularly in regions with a similar climate and terroir.
+   </p>
+   <li>
+  <strong>Meritage:</strong>
+   <p>- Is a term used in the United States to describe a specific blend of wines made from traditional Bordeaux grape varieties. 
+    The term is a combination of "merit" and "heritage," 
+    implying a high-quality blend rooted in Bordeaux traditions.
+   </p>
+   <p>- To be labeled as "Meritage," the wine must be a blend of at least two of the following grape varieties:
+    <ul>
+      <li><strong>Red Meritage:</strong> Cabernet Sauvignon, Merlot, Cabernet Franc, Petit Verdot, Malbec</li>
+      <li><strong>White Meritage:</strong> Sauvignon Blanc, Sémillon, Muscadelle</li>
+    </ul>
+    <p>- Unlike the term "Bordeaux Blend," which refers to blends from the Bordeaux region in France, 
+    "Meritage" is protected by a trademark and is used exclusively for wines made in the U.S.
+    </p>
+
+  <h2>Game Meats:</h2>
+    <li>
+      <strong>Venison (Deer)</strong>
+      <ul>
+        <li>
+          <strong>Description</strong>: Venison is lean, dark red meat
+          with a robust, slightly sweet flavor. It’s often described
+          as “earthy” and can be slightly gamey depending on the cut
+          and preparation.
+        </li>
+        <li>
+          <strong>Wine Pairing</strong>: Full-bodied reds with good
+          acidity and tannin structure complement venison well.
+          <strong>Cabernet Sauvignon</strong>, <strong>Syrah</strong>,
+          <strong>Zinfandel</strong>, and <strong>Malbec</strong> are
+          excellent choices. The tannins help balance the richness and
+          earthy flavors.
+        </li>
+      </ul>
+    </li>
+
+    <li>
+      <strong>Wild Boar</strong>
+      <ul>
+        <li>
+          <strong>Description</strong>: Wild boar is leaner and has a
+          more intense, slightly sweet and nutty flavor compared to
+          domestic pork. It can also be a bit fattier in some cuts.
+        </li>
+        <li>
+          <strong>Wine Pairing</strong>: Wines like
+          <strong>Zinfandel</strong>, <strong>Sangiovese</strong>, or
+          <strong>Barbera</strong> are great with wild boar, as their
+          acidity and fruitiness can balance the gaminess and fat.
+          Bold reds with some spice work particularly well.
+        </li>
+      </ul>
+    </li>
+
+    <li>
+      <strong>Rabbit</strong>
+      <ul>
+        <li>
+          <strong>Description</strong>: Rabbit meat is light, lean,
+          and delicate in flavor, often described as somewhere between
+          chicken and game. It’s slightly earthy but not as intense as
+          venison or wild boar.
+        </li>
+        <li>
+          <strong>Wine Pairing</strong>: Lighter red wines like
+          <strong>Pinot Noir</strong> or medium-bodied whites like
+          <strong>Chardonnay</strong> (especially if oak-aged) work
+          well with rabbit. For a more rustic pairing,
+          <strong>Gamay</strong> or <strong>Grenache</strong> can also
+          be a good match.
+        </li>
+      </ul>
+    </li>
+
+    <li>
+      <strong>Pheasant</strong>
+      <ul>
+        <li>
+          <strong>Description</strong>: Pheasant is a lean bird with a
+          mild, slightly sweet, and earthy flavor. It’s richer than
+          chicken but not as intense as duck.
+        </li>
+        <li>
+          <strong>Wine Pairing</strong>: A light to medium-bodied red
+          like <strong>Pinot Noir</strong> or a white with some
+          structure like <strong>Chardonnay</strong> (preferably one
+          with some oak influence) complements pheasant nicely. If the
+          pheasant is prepared with a richer sauce, a more full-bodied
+          wine like <strong>Merlot</strong> or
+          <strong>Zinfandel</strong> could also work.
+        </li>
+      </ul>
+    </li>
+
+    <li>
+      <strong>Duck</strong>
+      <ul>
+        <li>
+          <strong>Description</strong>: Duck is a fatty, flavorful
+          bird with rich, dark meat and a slightly gamey flavor. It’s
+          often cooked with a crispy skin or in rich sauces (like
+          orange sauce or berry reductions), which can add complexity
+          to the dish.
+        </li>
+        <li>
+          <strong>Wine Pairing</strong>:
+          <strong>Pinot Noir</strong> is a classic choice due to its
+          ability to pair with the richness and fat in duck. Other
+          good choices include <strong>Zinfandel</strong>,
+          <strong>Syrah</strong>, or even <strong>Shiraz</strong>,
+          especially when the dish has a sweet component like fruit
+          sauce or glaze.
+        </li>
+      </ul>
+    </li>
+
+    <li>
+      <strong>Quail</strong>
+      <ul>
+        <li>
+          <strong>Description</strong>: Quail is another small bird,
+          typically lean with delicate meat. It has a mild, somewhat
+          nutty flavor and is often roasted or grilled.
+        </li>
+        <li>
+          <strong>Wine Pairing</strong>: Light to medium reds like
+          <strong>Pinot Noir</strong>, <strong>Gamay</strong>, or
+          whites like <strong>Viognier</strong> work well with quail.
+          If served with a sweet or fruity glaze, a wine like
+          <strong>Zinfandel</strong> can also be a great match.
+        </li>
+      </ul>
+    </li>
+  </ul>
+      
+  <h2>Game Meat Characteristics:</h2>
+  <ul>
+    <li>
+      <strong>Leanness</strong>: Game meats are generally leaner than
+      farm-raised meats, meaning they have less fat, which can make
+      them drier and more intense in flavor.
+    </li>
+    <li>
+      <strong>Earthy, Robust Flavors</strong>: The wild diet of the
+      animals results in stronger, sometimes gamey flavors that can be
+      overwhelming if paired with delicate wines. Bold wines with
+      structure are often preferred to stand up to these flavors.
+    </li>
+  </ul>
+
+  <h2>Steak Doneness:</h2>
+  <ul>
+    <li>
+      <strong>Rare</strong>
+      <ul>
+        <li>
+          <strong>Internal Temperature:</strong> 120-125°F (49-52°C)
+        </li>
+        <li>
+          <strong>Description:</strong> Very red, cool center. The
+          outside is seared, while the inside remains very raw and
+          tender. Rare steaks are usually very soft and juicy.
+        </li>
+      </ul>
+    </li>
+
+    <li>
+      <strong>Medium Rare</strong>
+      <ul>
+        <li>
+          <strong>Internal Temperature:</strong> 130-135°F (54-57°C)
+        </li>
+        <li>
+          <strong>Description:</strong> Warm, red center. This is
+          often considered the ideal doneness for steaks, providing a
+          good balance of tenderness, flavor, and juiciness. The
+          outside is seared, and the inside remains pink with a warm,
+          red center.
+        </li>
+      </ul>
+    </li>
+
+    <li>
+      <strong>Medium</strong>
+      <ul>
+        <li>
+          <strong>Internal Temperature:</strong> 140-145°F (60-63°C)
+        </li>
+        <li>
+          <strong>Description:</strong> Pink center with a slightly
+          firm texture. The steak is cooked through, but still retains
+          some juiciness and flavor. The outside is browned and a bit
+          more cooked.
+        </li>
+      </ul>
+    </li>
+
+    <li>
+      <strong>Medium Well</strong>
+      <ul>
+        <li>
+          <strong>Internal Temperature:</strong> 150-155°F (66-68°C)
+        </li>
+        <li>
+          <strong>Description:</strong> Slightly pink center with a
+          firm texture. The steak is nearly fully cooked, with just a
+          hint of pink inside. It may be a bit drier than a medium
+          steak.
+        </li>
+      </ul>
+    </li>
+
+    <li>
+      <strong>Well Done</strong>
+      <ul>
+        <li><strong>Internal Temperature:</strong> 160°F+ (71°C+)</li>
+        <li>
+          <strong>Description:</strong> Fully cooked with no pink,
+          dry, and firm throughout. The outside is browned and
+          charred, while the inside is grayish-brown, with very little
+          moisture left.
+        </li>
+      </ul>
+    </li>
+  </ul>
+
+  <h2>Food Pairing Considerations for Doneness:</h2>
+  <ul>
+    <li>
+      <strong>Rare and Medium Rare</strong>: Often paired with
+      full-bodied red wines like <strong>Cabernet Sauvignon</strong>,
+      <strong>Malbec</strong>, or <strong>Syrah</strong>. The bold
+      tannins and rich fruit of these wines complement the richness of
+      the meat.
+    </li>
+
+    <li>
+      <strong>Medium</strong>: Pairs well with a range of red wines,
+      such as <strong>Merlot</strong> or <strong>Zinfandel</strong>,
+      which balance the meat's richness without overpowering the
+      flavor.
+    </li>
+
+    <li>
+      <strong>Medium Well and Well Done</strong>: Lighter red wines like
+      <strong>Pinot Noir</strong> or <strong>Chianti</strong>, or even
+      whites like <strong>Chardonnay</strong>, can work better with
+      these levels of doneness since the meat tends to become drier
+      and less juicy.
+    </li>
+  </ul>
+     <!-- Trigger button to open the first modal -->
+  <button id="openModalBtn">Next page...</button>
+  <ul><li><strong>Note:</strong>To close this modal, click the <strong>(X)</strong> symbol or click outside the modal.</li></ul>
+    
+     <!-- First Instructional Modal -->
+  <div id="modal1" class="modal">
+    <div class="modal-content">
+     <h2>Wine Pairings for Tomato-Based Sauces</h2>
+  <p>When tomato is the base sauce for a dish (such as in pasta, pizza, or other Italian-inspired dishes), wine pairings depend on the acidity and richness of the tomato sauce. Tomato-based sauces are typically tangy, with a balance of acidity, and they often have savory, herbal, and slightly sweet characteristics depending on the recipe.</p>
+
+  <h3>1. Red Wines:</h3>
+  <ul>
+    <li><strong>Chianti (Sangiovese)</strong><br>
+        <em>Region:</em> Tuscany, Italy<br>
+        Chianti is a classic red wine from the heart of Tuscany, made primarily from the Sangiovese grape. It has high acidity, which makes it an ideal match for tomato-based sauces, especially Italian dishes like pasta or pizza.
+    </li>
+    <li><strong>Zinfandel</strong><br>
+        <em>Region:</em> California, USA (also in parts of Italy, known as Primitivo)<br>
+        Zinfandel is known for its bold flavors of ripe fruit and spice, making it a great pairing with rich, tomato-based dishes like pizza or pasta with meat sauce.
+    </li>
+    <li><strong>Barbera</strong><br>
+        <em>Region:</em> Piedmont, Italy<br>
+        Barbera is an Italian red wine, highly regarded for its bright acidity and fruit-forward character. It’s a versatile wine that works particularly well with tomato-based sauces, including pasta, pizza, or dishes with roasted vegetables.
+    </li>
+    <li><strong>Cabernet Sauvignon</strong><br>
+        <em>Region:</em> Bordeaux (France), Napa Valley (California, USA), Coonawarra (Australia), and more<br>
+        Known for its full body and tannins, Cabernet Sauvignon pairs well with rich tomato-based dishes, especially those involving grilled meats, beef, or lamb.
+    </li>
+    <li><strong>Merlot</strong><br>
+        <em>Region:</em> Bordeaux (France), California (USA), Chile, Australia<br>
+        Merlot is a softer, fruitier red wine compared to Cabernet Sauvignon. Its smooth texture and moderate acidity make it a good match for tomato-based dishes, especially when paired with roasted meats, pasta, or poultry.
+    </li>
+  </ul>
+
+  <h3>2. White Wines:</h3>
+  <ul>
+    <li><strong>Pinot Grigio</strong><br>
+        <em>Region:</em> Veneto, Friuli Venezia Giulia (Italy), Oregon (USA), Alsace (France)<br>
+        This light and crisp white wine is known for its refreshing acidity and subtle flavors. It’s an excellent pairing for lighter tomato-based dishes, like seafood pasta or a light vegetable sauce.
+    </li>
+    <li><strong>Sauvignon Blanc</strong><br>
+        <em>Region:</em> Loire Valley (France), Marlborough (New Zealand), California (USA)<br>
+        Sauvignon Blanc’s crisp acidity and herbaceous flavors make it an excellent match for tomato-based dishes that include herbs or vegetables, like a fresh tomato salad or pasta with pesto.
+    </li>
+    <li><strong>Unoaked Chardonnay</strong><br>
+        <em>Region:</em> Burgundy (France), Sonoma Coast (California, USA), Australia<br>
+        An unoaked Chardonnay offers a refreshing crispness with flavors of green apple and citrus, which complement tomato sauces, particularly with lighter dishes like chicken pasta or seafood-based sauces.
+    </li>
+    <li><strong>Vermentino</strong><br>
+        <em>Region:</em> Sardinia (Italy), Tuscany (Italy), Liguria (Italy), Corsica (France)<br>
+        Vermentino is an aromatic white wine with citrus and herbal notes that pair well with seafood or light vegetable-based tomato sauces. It’s a perfect choice for Mediterranean-inspired dishes.
+    </li>
+  </ul>
+
+  <h3>3. Rosé Wines:</h3>
+  <ul>
+    <li><strong>Provence Rosé</strong><br>
+        <em>Region:</em> Provence (France)<br>
+        Provence is the birthplace of rosé, and wines from this region are known for their crisp, dry, and fruity character. Provence rosé has enough acidity to pair wonderfully with pasta, pizza, and Mediterranean dishes with tomato sauce.
+    </li>
+    <li><strong>Grenache Rosé</strong><br>
+        <em>Region:</em> Rhône Valley (France), Spain (where it’s known as Garnacha), California (USA)<br>
+        Grenache rosé is light, fruity, and refreshing, making it a great pairing with tomato-based dishes that are slightly on the sweeter or spicier side, such as barbecue pizza or pasta with sausage.
+    </li>
+    <li><strong>Tempranillo Rosé</strong><br>
+        <em>Region:</em> Rioja (Spain), Navarra (Spain), and other parts of Spain<br>
+        Tempranillo rosé brings berry fruit flavors along with a touch of spice. It pairs beautifully with tomato-based dishes like pizza or pasta with a rich tomato sauce or grilled vegetables.
+    </li>
+  </ul>
+      <button id="nextBtn1">Next</button>
+      <button id="closeBtn1">Back</button>
+    </div>
+  </div>
+
+  <!-- Second Instructional Modal -->
+  <div id="modal2" class="modal">
+    <div class="modal-content">
+       <h2>Wine Pairings for Cream-Based Sauces</h2>
+  <p>Cream-based sauces, with their rich, smooth texture, are a versatile foundation for many dishes. These sauces tend to be rich, buttery, and comforting, often pairing well with wines that can complement or cut through their creamy texture. Here are some excellent wine choices for cream-based dishes such as pasta Alfredo, chicken with cream sauce, or seafood with creamy dips.</p>
+
+  <h3>1. Red Wines:</h3>
+  <ul>
+    <li><strong>Pinot Noir</strong><br>
+        <em>Region:</em> Burgundy (France), Oregon (USA), California (USA)<br>
+        Pinot Noir is a light red wine with soft tannins and fresh fruit flavors. Its bright acidity and subtle complexity make it a great match for creamy dishes, particularly those with mushrooms or chicken.
+    </li>
+    <li><strong>Gamay</strong><br>
+        <em>Region:</em> Beaujolais (France)<br>
+        Gamay is known for its light body and fruity flavors, with mild tannins that complement the richness of cream-based dishes. It pairs wonderfully with poultry or dishes with a creamy mushroom sauce.
+    </li>
+    <li><strong>Merlot</strong><br>
+        <em>Region:</em> Bordeaux (France), California (USA), Chile, Australia<br>
+        Merlot's smooth, fruit-forward flavors and moderate acidity make it an excellent choice for creamy pasta dishes or roasted meats with cream-based sauces, such as chicken or pork.
+    </li>
+    <li><strong>Zinfandel</strong><br>
+        <em>Region:</em> California, USA (also in parts of Italy, known as Primitivo)<br>
+        Zinfandel’s bold flavors of ripe fruit and spice can balance the richness of cream sauces. It pairs well with dishes that feature hearty cream-based sauces, such as pasta with meatballs or creamy barbecue chicken.
+    </li>
+  </ul>
+
+  <h3>2. White Wines:</h3>
+  <ul>
+    <li><strong>Chardonnay</strong><br>
+        <em>Region:</em> Burgundy (France), Napa Valley (USA), Sonoma (USA), Australia<br>
+        A classic choice for creamy dishes, Chardonnay, particularly unoaked or lightly oaked varieties, offers a refreshing acidity that can cut through the richness of cream-based sauces, such as Alfredo or lobster pasta.
+    </li>
+    <li><strong>Sauvignon Blanc</strong><br>
+        <em>Region:</em> Loire Valley (France), Marlborough (New Zealand), California (USA)<br>
+        Sauvignon Blanc’s zesty acidity and citrus notes help balance the heaviness of cream sauces. It works especially well with creamy seafood dishes, such as crab or shrimp pasta.
+    </li>
+    <li><strong>Pinot Grigio</strong><br>
+        <em>Region:</em> Veneto (Italy), Friuli Venezia Giulia (Italy), Oregon (USA)<br>
+        Pinot Grigio is light and crisp, making it a perfect pairing for lighter cream-based sauces, particularly those with seafood or chicken, without overwhelming the dish.
+    </li>
+    <li><strong>Viognier</strong><br>
+        <em>Region:</em> Rhône Valley (France), California (USA), Australia<br>
+        Viognier is a rich, aromatic white wine with floral notes and a full body, which complements rich cream-based sauces. It pairs well with spicy creamy dishes, such as creamy curry or creamy chicken and vegetable dishes.
+    </li>
+  </ul>
+
+  <h3>3. Rosé Wines:</h3>
+  <ul>
+    <li><strong>Provence Rosé</strong><br>
+        <em>Region:</em> Provence (France)<br>
+        Provence rosé is a dry, crisp wine with bright acidity, making it a versatile pairing for creamy pasta dishes, especially those with a light cream sauce and seafood.
+    </li>
+    <li><strong>Grenache Rosé</strong><br>
+        <em>Region:</em> Rhône Valley (France), Spain (where it’s known as Garnacha), California (USA)<br>
+        Grenache rosé is light and fruity, providing a fresh contrast to the richness of cream-based sauces. It works well with Mediterranean-style cream sauces, especially with grilled vegetables or chicken.
+    </li>
+    <li><strong>Tempranillo Rosé</strong><br>
+        <em>Region:</em> Rioja (Spain), Navarra (Spain), and other parts of Spain<br>
+        Tempranillo rosé offers berry fruit flavors and a touch of spice, making it a good match for cream-based dishes like creamy pasta or roasted meats with cream sauces.
+    </li>
+  </ul>
+      <button id="nextBtn2">Next</button>
+      <button id="closeBtn2">Back</button>
+    </div>
+  </div>
+    
+    <!-- Third Instructional Modal -->
+  <div id="modal3" class="modal">
+    <div class="modal-content">
+       <h2>Wine Pairings for Complex Dishes</h2>
+  <p>Complex dishes often feature a range of ingredients and flavors, including rich proteins, various herbs, spices, and diverse textures. These dishes can vary greatly, from gourmet meat dishes to intricate vegetarian options. For such dishes, wine pairings need to complement the dish's complexity without overwhelming the flavors. The wines selected should have enough depth and structure to enhance the various components of the dish.</p>
+
+  <h3>1. Red Wines:</h3>
+  <ul>
+    <li><strong>Cabernet Sauvignon</strong><br>
+        <em>Region:</em> Bordeaux (France), Napa Valley (USA), Coonawarra (Australia)<br>
+        Cabernet Sauvignon’s bold tannins and full body make it ideal for complex, hearty dishes such as steak with rich sauces, lamb with herbs, or braised meats. Its structure and depth balance the richness and diverse flavors in these dishes.
+    </li>
+    <li><strong>Syrah/Shiraz</strong><br>
+        <em>Region:</em> Rhône Valley (France), Barossa Valley (Australia)<br>
+        Syrah, known as Shiraz in Australia, is a powerful red with deep, spicy, and smoky flavors. It pairs well with complex meat dishes, like slow-cooked beef short ribs, barbecued meats, or dishes featuring strong spices or herbs like rosemary and thyme.
+    </li>
+    <li><strong>Merlot</strong><br>
+        <em>Region:</em> Bordeaux (France), California (USA), Chile, Australia<br>
+        Merlot's soft tannins and fruit-forward character make it a versatile option for complex dishes. It pairs beautifully with dishes featuring both red meats and rich sauces, such as duck breast or roast beef with mushrooms.
+    </li>
+    <li><strong>Château-Neuf-du-Pape (Grenache-based blend)</strong><br>
+        <em>Region:</em> Rhône Valley (France)<br>
+        This French wine blend, based on Grenache, offers deep fruit flavors, earthy undertones, and spices that match well with complex Mediterranean dishes, such as roasted lamb, stews, and dishes with a blend of vegetables, meats, and herbs.
+    </li>
+  </ul>
+
+  <h3>2. White Wines:</h3>
+  <ul>
+    <li><strong>Chardonnay (Oaked)</strong><br>
+        <em>Region:</em> Burgundy (France), Napa Valley (USA), Australia<br>
+        Oaked Chardonnay has a full body and complex flavors that pair wonderfully with rich and complex dishes. It is excellent with roasted chicken with creamy sauces, lobster with butter, or seafood pasta dishes that include both shellfish and rich cream.
+    </li>
+    <li><strong>Gewürztraminer</strong><br>
+        <em>Region:</em> Alsace (France), Germany, USA<br>
+        Gewürztraminer’s aromatic profile with floral, spicy, and sweet notes makes it a great pairing for dishes that combine sweetness and spice, such as Thai or Indian curries, or roasted meats with fruity accompaniments like apples or prunes.
+    </li>
+    <li><strong>Riesling (Off-Dry)</strong><br>
+        <em>Region:</em> Mosel (Germany), Alsace (France), Finger Lakes (USA)<br>
+        The slightly sweet and fruity notes of off-dry Riesling work well with spicy and complex dishes, like those with Asian spices or rich, spiced barbecue. It is also a good choice for dishes that balance sweetness and acidity, such as roast pork with apple glaze.
+    </li>
+    <li><strong>Sauvignon Blanc</strong><br>
+        <em>Region:</em> Loire Valley (France), Marlborough (New Zealand), California (USA)<br>
+        Sauvignon Blanc’s high acidity and herbaceous character pair well with complex vegetarian dishes, such as grilled vegetable salads or pasta with pesto. It also complements dishes with strong herbs and citrus notes, like goat cheese or lemony fish dishes.
+    </li>
+  </ul>
+
+  <h3>3. Rosé Wines:</h3>
+  <ul>
+    <li><strong>Provence Rosé</strong><br>
+        <em>Region:</em> Provence (France)<br>
+        Provence Rosé is light, crisp, and dry with fruity and herbal notes, making it an ideal pairing for Mediterranean-style complex dishes, such as grilled seafood, roasted vegetables, or dishes with a variety of fresh herbs like basil and thyme.
+    </li>
+    <li><strong>Tempranillo Rosé</strong><br>
+        <em>Region:</em> Rioja (Spain), Navarra (Spain)<br>
+        Tempranillo Rosé’s bright berry flavors and smooth finish work well with complex dishes that feature grilled meats, paella, or even slightly spiced dishes like tapas.
+    </li>
+    <li><strong>Grenache Rosé</strong><br>
+        <em>Region:</em> Rhône Valley (France), Spain (Garnacha), California (USA)<br>
+        Grenache Rosé’s berry fruit and soft tannins make it a great match for dishes with a wide range of flavors, such as roasted poultry, pork, or even dishes with a blend of sweet and savory ingredients like roasted chicken with caramelized onions and figs.
+    </li>
+  </ul>
+      <button id="closeBtn3">Back to Quick Guide</button>
+    </div>
+  </div>
+
+ </div>
+</div>
+      
+ 
+<h2>Food Preference</h2>
+
+<div class="search-container">
+  <label for="food-input">Enter a food item:</label>
+  <input type="text" id="food-input" list="food-list" placeholder="cheese, pasta, pork, chicken, fish, lamb, beef, game, steak..." oninput="updateFoodOptions()" />
+  <datalist id="food-list">
+    <option value="cheese"></option><option value="pasta"></option><option value="pork"></option>
+    <option value="chicken"></option><option value="fish"></option><option value="lamb"></option>
+    <option value="beef"></option><option value="game"></option><option value="steak"></option><option value="dessert"></option>
+  </datalist>
+</div>
+
+<!-- Chicken options -->
+<div id="chicken-container" style="display: none" class="search-container">
+  <label for="chicken-type">Preparation:</label>
+  <select id="chicken-type">
+    <option value="">---click to select---</option>
+    <option value="etc">Always well-cooked (e.g., Roast, Grill, Fry, etc.)</option>
+    <option value="pollo-tomato">Tomato-Based Sauce</option>
+    <option value="pollo-cream">Cream-Based Sauce</option>
+    <option value="pollo-chino">Szechuan Sauce</option>
+    <option value="pollo-adobo">Adobo (Chicken and Pork Adobo)</option>
+  </select>
+</div>
+
+<!-- Pork options -->
+<div id="pork-container" style="display: none" class="search-container">
+  <label for="pork-type">Preparation:</label>
+  <select id="pork-type">
+    <option value="">---click to select---</option>
+    <option value="pork-grill">Grilled (medium to medium-well)</option>
+    <option value="pork-grill2">Grilled (well-done)</option>
+    <option value="pork-tomato">Tomato-Based Stew</option>
+    <option value="pork-cream">Cream-Based Stew</option>
+    <option value="pork-barbie">Spare Ribs/ Pork Barbeque</option>
+    <option value="lechon">Letchon (Roasted Pork)</option>
+  </select>
+</div>
+
+<!-- Lamb options -->
+<div id="lamb-container" style="display: none" class="search-container">
+  <label for="lamb-type">Preparation:</label>
+  <select id="lamb-type">
+    <option value="">---click to select---</option>
+    <option value="lamb-roast">Roasted leg of lamb</option>
+    <option value="lamb-chop1">Lamb Chop (rare to medium-rare)</option>
+    <option value="lamb-chop2">Lamb-Chop (medium to medium well)</option>
+    <option value="lamb-chop3">Lamb-Chop (well done)</option>
+    <option value="lamb-stew">Lamb Stew</option>
+  </select>
+</div>
+
+<!-- Beef options -->
+<div id="beef-container" style="display: none" class="search-container">
+  <label for="beef-type">Preparation:</label>
+  <select id="beef-type">
+    <option value="">---click to select---</option>
+    <option value="beef-stew">Beef Stew</option>
+    <option value="beef-braise">Braised Beef</option>
+    <option value="beef-tapa">Beef Tapa</option>
+  </select>
+</div>
+
+<!-- Cheese options -->
+<div id="cheese-container" style="display: none" class="search-container">
+  <label for="cheese-type">Cheese Type:</label>
+  <select id="cheese-type">
+    <option value="">---click to select---</option>
+    <option value="fresh">Fresh Cheeses (mild, unripened, moist)</option>
+    <option value="soft-ripened">Soft-Ripened Cheeses (creamy interior with a soft, edible rind)</option>
+    <option value="semi-soft">Semi-Soft Cheeses (smooth, creamy texture, firmer than soft-ripened)</option>   
+    <option value="semi-hard">Semi-Hard Cheeses (firmer texture, maintain some moist)</option>
+    <option value="hard">Hard Cheeses (aged, lower moisture, firm, often crumbly)</option>
+    <option value="blue">Blue Cheeses (distinctive cultured mold, crumbly)</option>
+    <option value="goat">Goat Cheeses (vary in texture from soft to firm)</option>
+    <option value="washed-rind">Washed-Rind Cheeses (soft creamy texture, pungent aroma)</option>
+    <option value="processed">Processed Cheeses (smooth, creamy, and uniform texture)</option>
+    <option value="specialty">Specialty and Regional Cheeses (unique in particular region method)</option>
+  </select>
+</div>
+
+<!-- Pasta Sauce options -->
+<div id="pasta-sauce-container" style="display: none" class="search-container">
+  <label for="pasta-sauce">Sauce Types:</label>
+  <select id="pasta-sauce">
+    <option value="">---click to select---</option>
+    <option value="tomato">Tomato-Based Sauce</option>
+    <option value="cream">Cream-Based Sauce</option>
+    <option value="oil">Oil-Based Sauce</option>
+  </select>
+</div>
+
+<!-- Fish options -->
+<div id="fish-container" style="display: none" class="search-container">
+  <label for="fish-type">Fish Types:</label>
+  <select id="fish-type">
+    <option value="">click to select</option>
+    <option value="white-fish">White Fish (Cod, Haddock, Sole, Tilapia, Flounder)</option>
+    <option value="oily-fish">Oily Fish (Salmon, Mackerel, Sardines, Trout)</option>
+    <option value="shellfish">Shellfish (Lobster, Shrimp, Crab, Scallops)</option>
+    <option value="meaty-fish">Rich, Meaty Fish (Tuna, Swordfish, Halibut, Sea Bass)</option>
+    <option value="barbeque">Grilled or Barbecued Fish</option> 
+    <option value="creamy">Creamy or Rich Sauces (Chowder, Fish Pie, Fish Mornay)</option>
+    <option value="spicy">Spicy Dishes (Fish Tacos, Fish Curry, Fish with Chili)</option>
+    <option value="raw-fish">Raw Fish (Sushi, Sashimi, Ceviche)</option>
+  </select>
+</div>
+
+<!-- Game meats -->
+<div id="game-container" style="display: none" class="search-container">
+  <label for="game-type">Game Dishes:</label>
+  <select id="game-type"> 
+    <option value="">click to select</option>
+    <option value="small-roast">Roasted (Rabbit, Quail,  Pheasant, Duck)</option>
+    <option value="small-braise">Braised (Rabbit, Quail, Pheasant, Duck)</option>
+    <option value="small-stew">Stewed (Rabbit, Quail, Pheasant, Duck)</option>
+    <option value="duck-orange">Duck A l'orange</option>
+    <option value="big-braise">Braised (Venison, Wild Boar)</option>
+    <option value="big-stew">Stewed (Venison, Wild Boar)</option>
+    <option value="big-cream">Cream-Based (Venison, Wild Boar)</option>
+    <option value="big-grill">Grilled (Venison-medium to Well)</option>
+  </select>
+</div>
+
+<!-- Doneness or Sauce selection -->
+<div id="doneness-container" style="display: none" class="search-container">
+  <label for="doneness-type">Doneness:</label>
+  <select id="doneness-type">
+    <option value="">---click to select---</option>
+    <option value="rare">Rare to Medium Rare ( e.g., ribeye, T-bone, filet mignon )</option>
+    <option value="medium">Medium ( e.g., ribeye, T-bone, filet mignon )</option>
+    <option value="med-well">Med-Well to Well Done ( e.g., ribeye, T-bone, filet mignon )</option>
+  </select>
+</div>
+      
+      <!-- Dessert Selection -->
+<div id="dessert-container" style="display: none" class="search-container">
+  <label for="dessert-type">Dessert Type:</label>
+  <select id="dessert-type">
+    <option value="">---click to select---</option>
+    <option value="chocolate">Chocolate-Based Desserts (e.g., chocolate mousse, brownies, chocolate cake, truffles)</option>
+    <option value="custard"> Custard-Based Desserts (e.g., panna cotta, crème brûlée, custard tarts)</option>
+    <option value="nutty">Nutty Desserts (e.g., baklava, almond cake, pecan pie, hazelnut desserts)</option>
+    <option value="fruit">Fruit-Based Desserts (e.g., fruit tarts, fruit salads, poached pears, apple pie)</option>
+    <option value="caramel">Caramel and Spice Desserts (e.g., sticky toffee pudding, crème caramel, gingerbread, spiced cakes)</option>
+    <option value="citrus">Citrus Desserts (e.g., lemon meringue pie, lemon sorbet, key lime pie, orange cakes)</option>
+    <option value="cheesedessert">Cheese-Based Desserts (e.g., cheesecake, blue cheese with honey)</option>
+    <option value="light">Light and Refreshing Desserts (e.g., sorbets, fruit salads, light sponge cakes)</option>
+  </select>
+</div>
+
+<h2>Wine Preference</h2>
+<div class="search-container">
+  <label for="wine-type">Wine Types:</label>
+  <select id="wine-type">
+    <option value="">---click to select---</option>
+    <option value="red">Red</option>
+    <option value="white">White</option>
+    <option value="rosé">Rosé</option>
+    <option value="sparkling">Sparkling</option>
+    <option value="dessert">Dessert Wine (sweet wines & fortified wines)</option>
+  </select>
+
+  <label for="wine-region">Wine Regions:</label>
+  <select id="wine-region">
+    <option value="">---click to select---</option>
+    <option value="old-world">Old World</option>
+    <option value="new-world">New World</option>
+  </select>
+
+  <button onclick="findPairing()">Find Wine Pairing</button>
+  <button onclick="saveFavorite()">Save this pairing</button>
+</div>
+
+<h2>Wine Pairing Result</h2>
+<div id="pairing-result" class="result-container">
+  <!-- Result will be shown here -->
+</div>
+
+<script>
+    const categories = {
+      "Label & Classification": [
+        { english: "Wine", french: "[ Vin ]", pronunciation: "van" },
+        { english: "Sparkling wine", french: "[ Vin mousseux ]", pronunciation: "van moo-SUH" },
+        { english: "Dry", french: "[ Sec ]", pronunciation: "sek" },
+        { english: "Semi-dry", french: "[ Demi-sec ]", pronunciation: "duh-mee-SEK" },
+        { english: "Sweet", french: "[ Doux ]", pronunciation: "doo" },
+        { english: "Vintage", french: "[ Millésime ]", pronunciation: "mee-lay-ZEEM" },
+        { english: "Label", french: "[ Étiquette ]", pronunciation: "ay-tee-KET" },
+        { english: "Producer", french: "[ Producteur ]", pronunciation: "pro-dooc-TEUR" }
+      ],
+      "Region & Regulation": [
+        { english: "Region", french: "[ Région ]", pronunciation: "ray-ZHYOHN" },
+        { english: "Appellation", french: "[ Appellation ]", pronunciation: "ah-peh-la-SYON" },
+        { english: "Estate", french: "[ Domaine ]", pronunciation: "do-MEN" },
+        { english: "Castle / Wine Estate", french: "[ Château ]", pronunciation: "sha-TOH" },
+        { english: "Terroir", french: "[ Terroir ]", pronunciation: "tehr-WAHR" }
+      ],
+      "Production Process": [
+        { english: "Harvest", french: "[ Vendange ]", pronunciation: "von-DAHNJ" },
+        { english: "Barrel", french: "[ Fût ]", pronunciation: "foo" },
+        { english: "Bottle", french: "[ Bouteille ]", pronunciation: "boo-TAY" },
+        { english: "Cellar", french: "[ Cave ]", pronunciation: "kahv" },
+        { english: "Winemaking", french: "[ Vinification ]", pronunciation: "vee-nee-fee-ka-SYON" },
+        { english: "Fermentation", french: "[ Fermentation ]", pronunciation: "fehr-mon-ta-SYON" },
+        { english: "Aging", french: "[ Élevage ]", pronunciation: "ay-luh-VAHJ" }
+      ],
+      "Tasting Vocabulary": [
+        { english: "Tasting", french: "[ Dégustation ]", pronunciation: "day-goos-ta-SYON" },
+        { english: "Sommelier", french: "[ Sommelier ]", pronunciation: "soh-mel-YAY" },
+        { english: "Blend", french: "[ Assemblage ]", pronunciation: "ah-sahm-BLAHZH" },
+        { english: "Old vines", french: "[ Vieilles Vignes ]", pronunciation: "vye-yuh VEEN-yuh" },
+        { english: "Brut (very dry)", french: "[ Brut ]", pronunciation: "brüt" },
+        { english: "Light-bodied", french: "[ Léger ]", pronunciation: "lay-ZHAY" },
+        { english: "Full-bodied", french: "[ Corsé ]", pronunciation: "kor-SAY" }
+      ],
+      "Grape Varieties": [
+        { english: "Pinot Noir", french: "[ Pinot Noir ]", pronunciation: "pee-noh NWAHR" },
+        { english: "Chardonnay", french: "[ Chardonnay ]", pronunciation: "shar-doh-NAY" },
+        { english: "Sauvignon Blanc", french: "[ Sauvignon Blanc ]", pronunciation: "soh-vee-nyon BLAHN" },
+        { english: "Cabernet Sauvignon", french: "[ Cabernet Sauvignon ]", pronunciation: "ka-ber-nay soh-vee-nyon" },
+        { english: "Syrah", french: "[ Syrah ]", pronunciation: "see-RAH" },
+        { english: "Merlot", french: "[ Merlot ]", pronunciation: "mehr-LOH" }
+      ]
+    };
+
+    const cookingCategories = {
+  "Culinary Techniques": [
+    { english: "Mise en place", french: "[ Mise en place ]", pronunciation: "meez-ahn-plahs", meaning: "Organizing and prepping all ingredients before cooking." },
+    { english: "Sauté", french: "[ Sauté ]", pronunciation: "soh-tay", meaning: "To quickly fry in a small amount of oil or fat." },
+    { english: "Roux", french: "[ Roux ]", pronunciation: "roo", meaning: "A cooked mixture of flour and fat used to thicken sauces." },
+    { english: "Julienne", french: "[ Julienne ]", pronunciation: "zhoo-lee-EN", meaning: "To cut vegetables into thin, matchstick-like strips." },
+    { english: "Sous vide", french: "[ Sous vide ]", pronunciation: "soo-veed", meaning: "Vacuum-sealed cooking in a temperature-controlled water bath." },
+    { english: "Confit", french: "[ Confit ]", pronunciation: "kohn-fee", meaning: "Meat or vegetables slow-cooked in fat or sugar." },
+    { english: "Velouté", french: "[ Velouté ]", pronunciation: "vuh-loo-tay", meaning: "A silky sauce made from a light stock thickened with roux." },
+    { english: "Crème fraîche", french: "[ Crème fraîche ]", pronunciation: "krehm fresh", meaning: "A thick, slightly tangy cultured cream used in cooking or sauces." },
+    { english: "En papillote", french: "[ En papillote ]", pronunciation: "ahn pah-pee-yawt", meaning: "Cooking in a parchment paper or foil pouch to steam food." },
+    { english: "Deglacer", french: "[ Déglacer ]", pronunciation: "day-glah-say", meaning: "Adding liquid to a hot pan to dissolve browned bits for flavor." }
+  ],
+  "French Sauces": [
+    { english: "Béchamel", french: "[ Béchamel ]", pronunciation: "bay-shah-MEL", meaning: "A white sauce made with milk and a white roux; base for cheese sauce." },
+    { english: "Velouté", french: "[ Velouté ]", pronunciation: "vuh-loo-tay", meaning: "Made with light stock (chicken, veal, or fish) and roux." },
+    { english: "Espagnole", french: "[ Espagnole ]", pronunciation: "es-pahn-YOHL", meaning: "A brown sauce made from brown stock, tomatoes, and brown roux." },
+    { english: "Sauce Tomate", french: "[ Sauce Tomate ]", pronunciation: "sohs toh-MAHT", meaning: "A classic tomato-based sauce often used in pasta or stews." },
+    { english: "Hollandaise", french: "[ Hollandaise ]", pronunciation: "oh-lan-DEHZ", meaning: "An emulsion of egg yolks, butter, and lemon juice—served warm." },
+    { english: "Béarnaise", french: "[ Béarnaise ]", pronunciation: "bay-ar-NEHZ", meaning: "A derivative of hollandaise, flavored with tarragon and shallots." },
+    { english: "Mayonnaise", french: "[ Mayonnaise ]", pronunciation: "mah-yoh-NEHZ", meaning: "A cold emulsion of egg yolk, oil, and acid like lemon or vinegar." },
+    { english: "Rémoulade", french: "[ Rémoulade ]", pronunciation: "ray-moo-LAHD", meaning: "A mayonnaise-based sauce flavored with mustard, herbs, or capers." },
+    { english: "Sauce Gribiche", french: "[ Sauce Gribiche ]", pronunciation: "sohs gree-BEESH", meaning: "A cold sauce made with hard-boiled eggs, herbs, and capers." }
+  ]
+};
+
+
+    const container = document.getElementById("categories-container");
+    const voiceSelect = document.getElementById("voiceSelect");
+    const cookingVoiceSelect = document.getElementById("cookingVoiceSelect");
+    let frenchVoices = [];
+
+    function renderCategories() {
+      for (const [categoryName, terms] of Object.entries(categories)) {
+        const section = document.createElement("div");
+        section.className = "category";
+
+        const header = document.createElement("h2");
+        header.textContent = categoryName;
+        header.onclick = () => {
+          const termsDiv = header.nextElementSibling;
+          termsDiv.style.display = termsDiv.style.display === "none" ? "block" : "none";
+        };
+
+        const termsDiv = document.createElement("div");
+        termsDiv.className = "terms";
+
+        terms.forEach(term => {
+          const div = document.createElement("div");
+          div.className = "term";
+          div.innerHTML = `
+            <span class="translation">${term.english}</span>: 
+            <strong>${term.french}</strong> – 
+            <em>${term.pronunciation}</em>
+            <button onclick="speakTerm('${term.french}')">🔊</button>
+          `;
+          termsDiv.appendChild(div);
+        });
+
+        section.appendChild(header);
+        section.appendChild(termsDiv);
+        container.appendChild(section);
+      }
+    }
+
+    function renderCookingTerms() {
+  const container = document.getElementById("cooking-terms-container");
+  container.innerHTML = "";
+
+  for (const [category, terms] of Object.entries(cookingCategories)) {
+    const section = document.createElement("div");
+    section.className = "category";
+
+    const header = document.createElement("h2");
+    header.textContent = category;
+    header.onclick = () => {
+      const termsDiv = header.nextElementSibling;
+      termsDiv.style.display = termsDiv.style.display === "none" ? "block" : "none";
+    };
+
+    const termsDiv = document.createElement("div");
+    termsDiv.className = "terms";
+
+    terms.forEach(term => {
+      const div = document.createElement("div");
+      div.className = "term";
+      div.innerHTML = `
+        <span class="translation">${term.english}</span>: 
+        <strong>${term.french}</strong> – 
+        <em>${term.pronunciation}</em><br>
+        <small>${term.meaning}</small>
+        <button onclick="speakCookingTerm('${term.french}')">🔊</button>
+      `;
+      termsDiv.appendChild(div);
+    });
+
+    section.appendChild(header);
+    section.appendChild(termsDiv);
+    container.appendChild(section);
+  }
+}
+
+    function loadVoices() {
+      const voices = speechSynthesis.getVoices();
+      frenchVoices = voices.filter(v => v.lang.startsWith("fr"));
+
+      voiceSelect.innerHTML = "";
+      cookingVoiceSelect.innerHTML = "";
+
+      frenchVoices.forEach((voice, index) => {
+        const option1 = document.createElement("option");
+        const option2 = document.createElement("option");
+        option1.value = option2.value = index;
+        option1.textContent = option2.textContent = `${voice.name} (${voice.lang})`;
+        voiceSelect.appendChild(option1);
+        cookingVoiceSelect.appendChild(option2);
+      });
+    }
+
+    function speakTerm(text) {
+      const utterance = new SpeechSynthesisUtterance(text);
+      const selectedVoice = frenchVoices[voiceSelect.value];
+      if (selectedVoice) utterance.voice = selectedVoice;
+      utterance.lang = 'fr-FR';
+      speechSynthesis.speak(utterance);
+    }
+
+    function speakCookingTerm(text) {
+      const utterance = new SpeechSynthesisUtterance(text);
+      const selectedVoice = frenchVoices[cookingVoiceSelect.value];
+      if (selectedVoice) utterance.voice = selectedVoice;
+      utterance.lang = 'fr-FR';
+      speechSynthesis.speak(utterance);
+    }
+
+    // Modal behaviors
+    const modal = document.getElementById("infoModal");
+    const cookingModal = document.getElementById("cookingModal");
+
+    document.getElementById("openModalBt").onclick = () => modal.style.display = "block";
+    document.getElementById("closeModalBt").onclick = () => modal.style.display = "none";
+
+    document.getElementById("openCookingModalBt").onclick = () => cookingModal.style.display = "block";
+      renderCookingTerms();
+
+    document.getElementById("closeCookingModalBt").onclick = () => cookingModal.style.display = "none";
+
+    window.onclick = e => {
+      if (e.target === modal) modal.style.display = "none";
+      if (e.target === cookingModal) cookingModal.style.display = "none";
+    };
+
+    renderCategories();
+    if (typeof speechSynthesis !== "undefined") {
+      speechSynthesis.onvoiceschanged = loadVoices;
+    }
+    
+</script>
+<script>
+  function saveFavorite() {
+    const foodInput = document.getElementById("food-input").value;
+    const wine = document.querySelector(".buy-link").textContent;
+    localStorage.setItem(
+      "favoritePairing",
+      JSON.stringify({ food: foodInput, wine: wine })
+    );
+    alert("Pairing saved to your favorites!");
+  }
+</script>
+ 
+ <!-- Google AdSense -->
+ <div class="adsense"> 
+ <ins class="adsbygoogl"
+      style="display: bloc"
+      data-ad-client="your-ad-client-id"
+      data-ad-slot="your-ad-slot-id"
+      data-ad-format="aut">
+ </ins>
+  <script>
+    (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+   
+      <h2>"Hello to everyone from Canada, the USA, the UK, Ireland, Japan, and the Philippines!,
+        <p>And a warm welcome to people from France, and India!"</p>"Aussies and Kiwis are also here".
+        <p>"Thank you for visiting my page! I'm so glad you're here. Feel free to explore and share."😊</p></h2>
+  <div id="social-share">
+    <h3>Please share on:</h3>
+    <a href="https://www.facebook.com/sharer/sharer.php?u=https://jerrys-food-and-wine-pairing.glitch.me/" target="_blank">
+      <button class="button-social" onclick="socialShare('Facebook')">Facebook</button>
+    </a>
+    <a href="https://twitter.com/intent/tweet?text=Check out this wine pairing!&url=https://jerrys-food-and-wine-pairing.glitch.me/" target="_blank">
+      <button class="button-social" onclick="socialShare('Twitter')">Twitter <strong>X</strong></button>
+    </a>
+   </div>
+  </div>
+</main>
+
+<footer>
+<p>&copy; 2024 Jerry's Food & Wine Pairing App</p>
+</footer>
+
+<script>
+  // Get the modal element
+  var modal0 = document.getElementById("exploreModal");
+
+  // Get the button that opens the modal
+  var btn = document.getElementById("exploreButton");
+
+  // Get the <span> element that closes the modal
+  var span = document.getElementsByClassName("close-btn")[0];
+
+  // When the user clicks the button, open the modal
+  btn.onclick = function () {
+    modal0.style.display = "block";
+  };
+
+  // When the user clicks on <span> (x), close the modal
+  span.onclick = function () {
+    modal0.style.display = "none";
+  };
+   // When the user clicks anywhere outside of the modal, close it
+   window.onclick = function (event) {
+        if (event.target == modal0) {
+          modal0.style.display = "none";
+        }
+      };
+  </script>
+  <script>
+// Open the Modal
+function openModal(category) {
+  var modal = document.getElementById("wineModal");
+  var section = document.getElementById(category);
+  modal.style.display = "block"; // Show the modal
+  // Hide all sections, then show the selected category section
+  var sections = document.querySelectorAll(".modal-section");
+  sections.forEach(function(sec) {
+    sec.style.display = "none";
+  });
+  section.style.display = "block";
+}
+
+// Close the Modal
+function closeWineModal() {
+  var modal = document.getElementById("wineModal");
+  modal.style.display = "none";
+}
+</script>
+  <script>
+ // Get modal elements
+    const modal1 = document.getElementById('modal1');
+    const modal2 = document.getElementById('modal2');
+    const modal3 = document.getElementById('modal3');
+    const openModalBtn = document.getElementById('openModalBtn');
+    const closeBtn1 = document.getElementById('closeBtn1');
+    const closeBtn2 = document.getElementById('closeBtn2');
+    const closeBtn3 = document.getElementById('closeBtn3');
+    const nextBtn1 = document.getElementById('nextBtn1');
+    const nextBtn2 = document.getElementById('nextBtn2');
+
+    // Open the first modal when the "Open Instructional Modal" button is clicked
+    openModalBtn.addEventListener('click', () => {
+      modal1.style.display = 'flex';
+    });
+
+    // Close the first modal when "Close" button in the first modal is clicked
+    closeBtn1.addEventListener('click', () => {
+      modal1.style.display = 'none';
+    });
+
+    // Close the second modal when "Close" button in the second modal is clicked
+    closeBtn2.addEventListener('click', () => {
+      modal2.style.display = 'none';
+    });
+
+    // Close the third modal when "Close" button in the third modal is clicked
+    closeBtn3.addEventListener('click', () => {
+      modal3.style.display = 'none';
+    });
+
+    // Open the second modal when the "Next" button in the first modal is clicked
+    nextBtn1.addEventListener('click', () => {
+      modal1.style.display = 'none'; // Close the first modal
+      modal2.style.display = 'flex'; // Open the second modal
+    });
+
+    // Open the third modal when the "Next" button in the second modal is clicked
+    nextBtn2.addEventListener('click', () => {
+      modal2.style.display = 'none'; // Close the second modal
+      modal3.style.display = 'flex'; // Open the third modal
+    });
+
+  </script>
+  
+   <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
+    import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
+    import { getDatabase, ref, set, get, child } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-database.js";
+
+    // Firebase configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyAmq70FyRHpUxad2zbxNpXRC9yfpP5pf3Q",
+      authDomain: "foodandwineapp.firebaseapp.com",
+      projectId: "foodandwineapp",
+      storageBucket: "foodandwineapp.appspot.com",
+      messagingSenderId: "977474748750",
+      appId: "1:977474748750:web:109ab166014db77b785e1f",
+      measurementId: "G-B8KRDP97TP",
+      databaseURL: "https://foodandwineapp-default-rtdb.asia-southeast1.firebasedatabase.app"  // Your Firebase Realtime Database URL
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getDatabase(app);
+
+    let isAdmin = false; // Track if the user is admin
+    const adminUID = "VqwKJwPK91Yb97kVEHQ3gCwWAxT2"; // Admin UID for reference
+
+    // Google Sign-In
+    document.getElementById('googleSignInBtn').onclick = function () {
+      const provider = new GoogleAuthProvider();
+          signInWithPopup(auth, provider)
+        .then((result) => {
+      const user = result.user;
+          console.log("Signed in as:", user.displayName);
+          checkAdmin(user.uid);  // Check if the user is admin after sign-in
+        })
+        .catch((error) => {
+          console.error("Error during sign-in:", error);
+          alert("Error during sign-in. Please try again.");
+        });
+    };
+
+    // Check if the user is admin
+    function checkAdmin(userId) {
+      if (userId === adminUID) {
+        isAdmin = true;
+      } else {
+        isAdmin = false;
+      }
+      loadQueries(); // Always load queries after the check
+    }
+
+    // Sign Out
+    document.getElementById('signOutBtn').onclick = function () {
+      signOut(auth)
+        .then(() => {
+          console.log("User signed out");
+          document.getElementById('googleSignInBtn').style.display = 'inline-block';
+          document.getElementById('signOutBtn').style.display = 'none';
+          document.getElementById('openQueryBtn').style.display = 'none';
+          isAdmin = false;
+          document.getElementById('adminReplyBox').style.display = 'none'; // Hide admin reply box
+        })
+        .catch((error) => {
+          console.error("Error signing out:", error.message);
+        });
+    };
+
+    // Handle authentication state
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        console.log("User is logged in:", user.displayName);
+        loadQueries(); // Load queries if user is logged in
+        document.getElementById('googleSignInBtn').style.display = 'none';
+        document.getElementById('signOutBtn').style.display = 'inline-block';
+        document.getElementById('openQueryBtn').style.display = 'inline-block';
+      } else {
+        console.log("User is not logged in.");
+        document.getElementById('googleSignInBtn').style.display = 'inline-block';
+        document.getElementById('signOutBtn').style.display = 'none';
+        document.getElementById('openQueryBtn').style.display = 'none';
+      }
+    });
+
+    // Open Query Box
+    document.getElementById("openQueryBtn").onclick = function () {
+      document.getElementById("queryBox").style.display = "flex";
+    };
+
+    // Close Query Box
+    document.getElementById("closeQueryBtn").onclick = function () {
+      document.getElementById("queryBox").style.display = "none";
+    };
+
+    // Add Query Function
+    document.getElementById("submitQueryBtn").onclick = function () {
+      const queryInput = document.getElementById("queryInput").value.trim();
+      const errorMessage = document.getElementById("error-message");
+
+      if (queryInput !== "") {
+        saveQuery(queryInput);
+        document.getElementById("queryInput").value = ''; // Clear input field
+        errorMessage.textContent = ''; // Clear any previous error messages
+      } else {
+        errorMessage.textContent = "Please enter a query.";
+      }
+    };
+
+    // Save query to Firebase
+    function saveQuery(queryText) {
+       const queryRef = ref(db, 'queries/').push(); // Automatically generates a unique key
+       set(queryRef, {
+       text: queryText,
+       timestamp: Date.now(),
+       reply: "" // Initialize with no reply
+    }).then(() => {
+       document.getElementById("queryInput").value = ''; // Clear input field after saving
+       loadQueries(); // Reload queries after posting
+    }).catch((error) => {
+       console.error('Error saving query:', error);
+    });
+  }
+
+    // Load Queries and Display Them
+    function loadQueries() {
+      const queryList = document.getElementById("queryList");
+      queryList.innerHTML = ""; // Clear current list
+      const queryRef = ref(db, 'queries/');
+      get(queryRef).then((snapshot) => {
+        if (snapshot.exists()) {
+          snapshot.forEach(childSnapshot => {
+            const queryData = childSnapshot.val();
+            const queryText = queryData.text;
+            const queryId = childSnapshot.key;
+            const queryItem = document.createElement("li");
+
+            // Display query text
+            queryItem.textContent = `Query: ${queryText}`;
+
+            // If admin, allow to reply to queries
+            if (isAdmin) {
+              const replyBtn = document.createElement("button");
+              replyBtn.textContent = "Reply";
+              replyBtn.onclick = function() {
+                const replyInput = document.getElementById('adminReplyInput').value.trim();
+                if (replyInput !== "") {
+                  const replyRef = ref(db, `queries/${queryId}/reply`);
+                  set(replyRef, {
+                    text: replyInput,
+                    timestamp: Date.now()
+                  }).then(() => {
+                    loadQueries(); // Reload after replying
+                    document.getElementById('adminReplyInput').value = ''; // Clear input
+                  });
+                }
+              };
+              queryItem.appendChild(replyBtn);
+            }
+
+            queryList.appendChild(queryItem);
+          });
+        } else {
+          console.log("No queries found.");
+        }
+      }).catch((error) => {
+        console.error("Error loading queries:", error);
+      });
+    }
+</script>
+  
+<script>
+  // Show the terms modal when the page loads
+  window.onload = function () {
+    const modal = document.getElementById("termsModal");
+    modal.style.display = "block";
+  };
+
+  // Close the modal when the "x" is clicked
+  const closeModal = document.getElementById("closeModal");
+  closeModal.onclick = function () {
+  const modal = document.getElementById("termsModal");
+  modal.style.display = "none";
+  };
+
+  // Accept the terms and close the modal
+  const acceptButton = document.getElementById("acceptButton");
+  acceptButton.onclick = function () {
+    // Store the user's acceptance in localStorage (or cookie, for more permanent storage)
+    localStorage.setItem("termsAccepted", "true");
+
+  // Close the modal
+  const modal = document.getElementById("termsModal");
+  modal.style.display = "none";
+
+    // Optionally, reload or enable the rest of the app's functionality here
+  };
+
+      // Check if user has already accepted terms (if they have, no modal is shown)
+   if (localStorage.getItem("termsAccepted") === "true") {
+      const modal = document.getElementById("termsModal");
+       modal.style.display = "none"; // Hide the modal
+     }
+      // Get the modal and button elements
+      const dropdownBtn = document.getElementById("dropdownBtn");
+      const dropdownModal = document.getElementById("dropdownModal");
+      const closeBtn = document.getElementById("closeBtn");
+
+      // Open the modal when the button is clicked
+      dropdownBtn.addEventListener("click", function () {
+        dropdownModal.style.display = "flex"; // Show the modal
+      });
+
+      // Close the modal when the close button is clicked
+      closeBtn.addEventListener("click", function () {
+        dropdownModal.style.display = "none"; // Hide the modal
+      });
+      
+      // Close the modal if the user clicks outside of the modal content
+      window.addEventListener("click", function (event) {
+        if (event.target === dropdownModal) {
+          dropdownModal.style.display = "none"; // Hide the modal
+        }
+      });
+      // Pairing data (replace or add with more data info/structure)
+  const pairings = {
+    "cheese": {
+      "fresh": {
+        "red": {
+          "old-world": { "wine": "Pinot Noir", "description": "A light-bodied, fruity red wine that complements the mild and creamy texture of fresh cheeses like ricotta or fresh mozzarella.", "affiliateLink": "https://example.com/" },
+          "new-world": { "wine": "Gamay", "description": "A fresh, fruit-forward red that pairs well with the delicate flavors of fresh cheeses, offering light acidity and berry notes.", "affiliateLink": "https://example.com/" },
+        },
+        "white": {
+          "old-world": { "wine": "Chablis", "description": "A dry, crisp white wine with mineral undertones, perfect for pairing with fresh cheeses like goat cheese or soft ricotta.", "affiliateLink": "https://example.com/" },
+          "new-world": { "wine": "Sauvignon Blanc", "description": "A bright, zesty white wine with citrus flavors that work wonderfully with the fresh, mild taste of unripened cheeses.", "affiliateLink": "https://example.com/" },
+        },
+      },
+      "soft-ripened": {
+        "red": {
+          "old-world": { "wine": "Pinot Noir", "description": "A light, elegant red with subtle red fruit flavors that complement the creamy texture and mild, earthy flavors of soft-ripened cheeses like Brie or Camembert.", "affiliateLink": "https://example.com/" },
+          "new-world": { "wine": "Merlot", "description": "A smooth, soft red with rich fruit flavors and velvety tannins that enhance the creamy richness of soft-ripened cheeses.", "affiliateLink": "https://example.com/" },
+        },
+        "white": {
+          "old-world": { "wine": "Chardonnay", "description": "A rich, buttery white wine from Burgundy that pairs well with soft-ripened cheeses, enhancing their creamy texture with its own smoothness.", "affiliateLink": "https://example.com/" },
+          "new-world": { "wine": "Sauvignon Blanc", "description": "A crisp, fresh white wine with herbaceous and citrus notes that contrasts well with the richness of soft-ripened cheeses.", "affiliateLink": "https://example.com/" },
+        },
+      },
+      "semi-soft": {
+        "red": {
+          "old-world": { "wine": "Zinfandel", "description": "A medium-bodied red with berry flavors and a touch of spice that pairs well with the smooth texture and slight tang of semi-soft cheeses like Havarti.", "affiliateLink": "https://example.com/" },
+          "new-world": { "wine": "Syrah", "description": "A bold, peppery red that works well with semi-soft cheeses, enhancing their creamy texture and providing a nice balance of flavors.", "affiliateLink": "https://example.com/" },
+        },
+        "white": {
+          "old-world": { "wine": "Riesling", "description": "A slightly sweet and aromatic white wine with crisp acidity, great for pairing with semi-soft cheeses like Gruyère.", "affiliateLink": "https://example.com/" },
+          "new-world": { "wine": "Chardonnay", "description": "A full-bodied, oaky white wine that pairs well with creamy semi-soft cheeses, bringing out their richness while balancing the flavor.", "affiliateLink": "https://example.com/" },
+        },
+      },
+      "semi-hard": {
+        "red": {
+          "old-world": { "wine": "Bordeaux Cabernet", "description": "A full-bodied red with firm tannins and deep fruit flavors, ideal for pairing with semi-hard cheeses like Manchego or Comté.", "affiliateLink": "https://example.com/" },
+          "new-world": { "wine": "Zinfandel", "description": "A bold red wine with rich fruit flavors that works well with the firm, slightly nutty flavor of semi-hard cheeses.", "affiliateLink": "https://example.com/" },
+        },
+        "white": {
+          "old-world": { "wine": "Chablis", "description": "A crisp, dry white wine with mineral notes that balances the richness and slight sharpness of semi-hard cheeses.", "affiliateLink": "https://example.com/" },
+          "new-world": { "wine": "Chardonnay", "description": "A rich, full-bodied white wine with buttery notes that pairs nicely with semi-hard cheeses, providing balance and depth to the flavor.", "affiliateLink": "https://example.com/" },
+        },
+      },
+      "hard": {
+        "red": {
+          "old-world": { "wine": "Barolo", "description": "A full-bodied, tannic red wine with earthy and fruity flavors, perfect for pairing with aged hard cheeses like Parmigiano Reggiano or Pecorino.", "affiliateLink": "https://example.com/" },
+          "new-world": { "wine": "Syrah", "description": "A bold, spicy red wine that complements the complex flavors of hard cheeses, bringing out their nutty and savory qualities.", "affiliateLink": "https://example.com/" },
+        },
+        "white": {
+          "old-world": { "wine": "Champagne", "description": "A dry, effervescent white wine that cuts through the richness and saltiness of hard cheeses like aged Gouda or Parmesan.", "affiliateLink": "https://example.com/" },
+          "new-world": { "wine": "Sauvignon Blanc", "description": "A crisp, citrusy white wine that provides a refreshing contrast to the dense, crumbly texture of hard cheeses.", "affiliateLink": "https://example.com/" },
+        },
+      },
+      "blue": {
+        "dessert": {
+          "old-world": { "wine": "Port", "description": "A rich, fortified wine with deep, sweet flavors that pairs well with the pungent, salty notes of blue cheeses like Roquefort or Stilton.", "affiliateLink": "https://example.com/" },
+        },
+        "red": {
+          "new-world": { "wine": "Shiraz", "description": "A bold, spicy red that complements the intense, tangy flavors of blue cheeses, balancing the richness with its own powerful character.", "affiliateLink": "https://example.com/" },
+        },
+        "white": {
+          "old-world": { "wine": "Sauternes", "description": "A sweet, dessert-style wine from Bordeaux that pairs excellently with blue cheeses, providing a perfect balance of sweetness and richness.", "affiliateLink": "https://example.com/" },
+          "new-world": { "wine": "Gewürztraminer", "description": "An aromatic, slightly sweet white wine that enhances the bold, tangy flavors of blue cheese while offering a refreshing contrast.", "affiliateLink": "https://example.com/" },
+        },
+      },
+      "goat": {
+        "red": {
+          "old-world": { "wine": "Pinot Noir", "description": "A light, elegant red with subtle berry flavors that complements the tangy, fresh flavors of goat cheese.", "affiliateLink": "https://example.com/" },
+          "new-world": { "wine": "Zinfandel", "description": "A fruity red with a slight spiciness that pairs well with goat cheeses, balancing their tangy and creamy textures.", "affiliateLink": "https://example.com/" },
+        },
+        "white": {
+          "old-world": { "wine": "Sancerre", "description": "A crisp, citrusy Sauvignon Blanc from France, ideal for pairing with tangy goat cheeses, providing a refreshing contrast.", "affiliateLink": "https://example.com/" },
+          "new-world": { "wine": "Chardonnay", "description": "A fresh, crisp white wine that works beautifully with goat cheese, enhancing its creamy texture and tangy flavor.", "affiliateLink": "https://example.com/" },
+        },
+      },
+      "washed-rind": {
+        "red": {
+          "old-world": { "wine": "Grenache", "description": "A medium-bodied red wine with red fruit flavors and a touch of spice that pairs well with the pungent and creamy texture of washed-rind cheeses.", "affiliateLink": "https://example.com/" },
+          "new-world": { "wine": "Syrah", "description": "A bold red wine with peppery notes and dark fruit flavors that complement the strong aromas and flavors of washed-rind cheeses.", "affiliateLink": "https://example.com/" },
+        },
+        "white": {
+          "old-world": { "wine": "Chablis", "description": "A crisp, dry Chardonnay from Burgundy that balances the richness and pungency of washed-rind cheeses.", "affiliateLink": "https://example.com/" },
+          "new-world": { "wine": "Riesling", "description": "A slightly sweet and aromatic white wine that complements the strong flavors and creamy textures of washed-rind cheeses.", "affiliateLink": "https://example.com/" },
+        },
+      },
+      "processed": {
+        "red": {
+          "old-world": { "wine": "Merlot", "description": "A soft, fruity red wine that pairs well with the smooth and uniform texture of processed cheeses.", "affiliateLink": "https://example.com/" },
+          "new-world": { "wine": "Cabernet Sauvignon", "description": "A bold red wine with firm tannins and dark fruit flavors, ideal for pairing with the milder flavors of processed cheeses.", "affiliateLink": "https://example.com/" },
+        },
+        "white": {
+          "old-world": { "wine": "Chardonnay", "description": "A rich, buttery white wine that complements the smooth texture and mild flavors of processed cheeses.", "affiliateLink": "https://example.com/" },
+          "new-world": { "wine": "Sauvignon Blanc", "description": "A fresh and crisp white wine with citrusy flavors that pair well with processed cheeses, cutting through their richness.", "affiliateLink": "https://example.com/" },
+        },
+      },
+      "specialty": {
+        "red": {
+           "old-world": { "wine": "Bordeaux", "description": "A complex red wine with earthy and fruity notes that pairs well with unique and regional cheeses, adding depth to their flavors.", "affiliateLink": "https://example.com/" },
+           "new-world": { "wine": "Malbec", "description": "A rich red wine with bold fruit flavors and a smooth texture that complements the diverse flavors of specialty cheeses.", "affiliateLink": "https://example.com/" },
+        },
+        "white": {
+           "old-world": { "wine": "Chablis", "description": "A crisp, mineral-driven Chardonnay that pairs well with a wide variety of specialty cheeses.", "affiliateLink": "https://example.com/" },
+           "new-world": { "wine": "Sauvignon Blanc", "description": "A vibrant and citrusy white wine that works with a range of regional cheeses, balancing their flavors.", "affiliateLink": "https://example.com/" },
+        },
+      }
+    },
+  "pasta": {
+      "tomato": {
+        "red": {
+          "old-world": { "wine": "Chianti", "description": "A dry red wine with high acidity, perfect for tomato-based dishes.", "affiliateLink": "https://example.com/" },
+          "new-world": { "wine": "California Zinfandel", "description": "A spicy red wine with fruit-forward flavors that works with tomato pasta.", "affiliateLink": "https://example.com/" },
+        },      
+        "white": {
+          "old-world": { "wine": "Pinot Grigio", "description": "A crisp white wine from Italy, great for light pasta dishes with tomato sauce.", "affiliateLink": "https://example.com/" },
+          "new-world": { "wine": "Chardonnay", "description": "A fuller white wine with oak and fruit notes, ideal for creamy tomato-based pasta.", "affiliateLink": "https://example.com/" },
+        },
+      },
+      "cream": {
+        "red": {
+          "old-world": { "wine": "Pinot Noir", "description": "A light red wine with subtle fruit flavors, perfect for creamy pasta.", "affiliateLink": "https://example.com/" },
+          "new-world": { "wine": "Merlot", "description": "A smooth, fruity red wine that complements creamy pasta dishes.", "affiliateLink": "https://example.com/" },
+        },     
+        "white": {
+          "old-world": { "wine": "Chablis", "description": "A crisp, dry white wine from Burgundy, ideal with cream sauces.", "affiliateLink": "https://example.com/" },
+          "new-world": { "wine": "Sauvignon Blanc", "description": "A refreshing white wine with citrus notes that pairs well with creamy dishes.", "affiliateLink": "https://example.com/" },
+        },
+      },
+      "oil": {
+        "red": {
+          "old-world": { "wine": "Barbera d'Asti", "description": "A light-bodied, high-acid red wine from Piedmont, Italy. It has berry flavors and refreshing acidity that balance well with oily dishes.", "affiliateLink": "https://example.com/"},
+          "new-world": { "wine": "Zinfandel", "description": "A bold red with ripe fruit flavors, peppery spice, and a touch of sweetness that complements the richness of oily dishes.", "affiliateLink": "https://example.com/" },
+        },
+        "white": { 
+          "old-world": { "wine": "Albariño", "description": "A crisp, dry white wine from Spain with citrusy notes and good acidity, making it a great match for oily sauces.", "affiliateLink": "https://example.com/" },
+          "new-world": { "wine": "Chardonnay", "description": "A fuller-bodied white wine with buttery flavors that enhances the richness of oily dishes, particularly those with seafood or pasta.", "affiliateLink": "https://example.com/" },
+        }
+      }
+    },
+    "fish": {
+      "white-fish": {
+        "red": {
+          "old-world": { "wine": "Pinot Noir", "description": "A light red wine with subtle berry flavors and refreshing acidity, perfect for delicate white fish like cod and sole.", "affiliateLink": "https://example.com/" },
+          "new-world": { "wine": "Gamay", "description": "A light-bodied, fruit-forward red that pairs well with mild white fish without overpowering the flavor.", "affiliateLink": "https://example.com/" },
+        },
+        "white": {
+          "old-world": { "wine": "Sancerre", "description": "A crisp, mineral-driven Sauvignon Blanc from France, ideal for white fish due to its fresh acidity and citrusy notes.", "affiliateLink": "https://example.com/" },
+          "new-world": { "wine": "Chardonnay", "description": "A fresh and crisp Chardonnay with green apple and citrus flavors, perfect for pairing with white fish like cod or haddock.", "affiliateLink": "https://example.com/" },
+        },
+      },
+      "oily-fish": {
+        "red": {
+          "old-world": { "wine": "Côtes du Rhône", "description": "A medium-bodied red from the Rhône Valley, with flavors of red berries and herbs that complement the richness of oily fish like salmon.", "affiliateLink": "https://example.com/" },
+          "new-world": { "wine": "Zinfandel", "description": "A bold, fruity red with a peppery finish that works well with the robust flavors of oily fish like mackerel and sardines.", "affiliateLink": "https://example.com/" },
+        },
+        "white": {
+          "old-world": { "wine": "Chablis","description": "A dry, mineral-rich Chardonnay from Burgundy, its acidity balances well with oily fish like trout and mackerel.", "affiliateLink": "https://example.com/" },
+          "new-world": { "wine": "Viognier", "description": "A fragrant white wine with floral and stone fruit notes, which pairs beautifully with the oily richness of fish like salmon and sardines.", "affiliateLink": "https://example.com/" },
+        },
+      },
+      "shellfish": {
+        "red": {
+          "old-world": { "wine": "Pinot Noir", "description": "A light-bodied red with subtle berry flavors, perfect for pairing with the delicate sweetness of shellfish like lobster or scallops.", "affiliateLink": "https://example.com/" },
+          "new-world": { "wine": "Merlot", "description": "A smooth red with soft tannins and fruity notes that pairs well with shellfish dishes such as shrimp or crab.", "affiliateLink": "https://example.com/" },
+        },
+        "white": {
+          "old-world": { "wine": "Muscadet", "description": "A dry, crisp white wine from the Loire Valley, ideal for shellfish with its bright acidity and minerality.", "affiliateLink": "https://example.com/" },
+          "new-world": { "wine": "Sauvignon Blanc", "description": "A zesty and citrus-forward white wine that complements the fresh, briny flavors of shellfish like oysters, shrimp, and crab.", "affiliateLink": "https://example.com/" },
+        },
+      },
+      "meaty-fish": {
+        "red": {
+          "old-world": { "wine": "Bordeaux Cabernet", "description": "A full-bodied red with deep fruit flavors and firm tannins, perfect for pairing with rich, meaty fish like tuna and swordfish.","affiliateLink": "https://example.com/" },
+          "new-world": { "wine": "Syrah", "description": "A robust red with bold black fruit and peppery spice, matching the intense flavors of meaty fish like halibut or tuna.", "affiliateLink": "https://example.com/" },
+        },
+        "white": {
+          "old-world": { "wine": "Chablis", "description": "A crisp, mineral-driven Chardonnay, which provides a fresh, clean contrast to the richness of meaty fish like halibut.", "affiliateLink": "https://example.com/" },
+          "new-world": { "wine": "Chardonnay", "description": "A rich, full-bodied Chardonnay with buttery notes that pairs excellently with the dense texture of meaty fish like swordfish.", "affiliateLink": "https://example.com/" },
+        },
+      },
+      "barbeque": {
+        "red": {
+          "old-world": { "wine": "Grenache", "description": "A medium-bodied red with red berry flavors and a touch of spice, ideal for grilled fish with smoky flavors.", "affiliateLink": "https://example.com/" },
+          "new-world": { "wine": "Zinfandel", "description": "A bold red with rich fruit and peppery notes, great for pairing with barbecued fish, bringing out the smoky flavors.", "affiliateLink": "https://example.com/" },
+        },
+        "white": {
+          "old-world": { "wine": "Chardonnay", "description": "A versatile, medium-bodied Chardonnay with a balance of oak and citrus, perfect for grilled fish with a tangy marinade.", "affiliateLink": "https://example.com/" },
+          "new-world": { "wine": "Riesling", "description": "A fruity, off-dry white wine that balances smoky grilled flavors with its crisp acidity and subtle sweetness.", "affiliateLink": "https://example.com/" },
+        },
+      },
+      "creamy": {
+        "red": {
+          "old-world": { "wine": "Pinot Noir", "description": "A light red wine with subtle berry flavors, perfect for creamy dishes like fish pie or chowder.", "affiliateLink": "https://example.com/" },
+          "new-world": { "wine": "Merlot", "description": "A smooth, medium-bodied red with fruity notes that complements rich, creamy seafood dishes.", "affiliateLink": "https://example.com/" },
+        },
+        "white": {
+          "old-world": { "wine": "Chablis", "description": "A dry and crisp white wine from Burgundy, ideal with creamy fish dishes like chowder or fish pie.", "affiliateLink": "https://example.com/" },
+          "new-world": { "wine": "Sauvignon Blanc", "description": "A refreshing white wine with citrusy notes that pairs well with rich, creamy seafood dishes.","affiliateLink": "https://example.com/" },
+        },
+      },
+      "spicy": {
+        "red": {
+          "old-world": { "wine": "Beaujolais", "description": "A light and fruity red wine from France, perfect for pairing with spicy dishes like fish tacos or curry.", "affiliateLink": "https://example.com/" },
+          "new-world": { "wine": "Zinfandel", "description": "A bold red with rich fruit flavors and a peppery finish, ideal for pairing with spicy fish dishes.", "affiliateLink": "https://example.com/" },
+        },
+        "white": {
+          "old-world": { "wine": "Riesling", "description": "An off-dry white wine with a touch of sweetness and crisp acidity, balancing the heat of spicy fish curries or tacos.", "affiliateLink": "https://example.com/" },
+          "new-world": { "wine": "Gewürztraminer", "description": "A fragrant, aromatic white wine that pairs well with the bold flavors of spicy dishes, such as fish curry or chili-spiced seafood.", "affiliateLink": "https://example.com/" },
+        },
+      },
+      "raw-fish": {
+        "red": {
+          "old-world": { "wine": "Pinot Noir", "description": "A light, fresh red wine that pairs wonderfully with sushi or sashimi without overpowering the delicate flavors.", "affiliateLink": "https://example.com/" },
+          "new-world": { "wine": "Gamay", "description": "A light, fruit-forward red that works well with raw fish, offering a refreshing contrast without overwhelming the taste.", "affiliateLink": "https://example.com/" },
+        },
+        "white": {
+          "old-world": { "wine": "Champagne", "description": "A dry, bubbly wine that pairs perfectly with raw fish like sushi, offering crispness and effervescence to cleanse the palate.", "affiliateLink": "https://example.com/" },
+          "new-world": { "wine": "Sauvignon Blanc", "description": "A crisp and aromatic white wine with citrus and herbaceous notes, perfect for pairing with sushi or ceviche.", "affiliateLink": "https://example.com/" },
+        },
+      }
+    },
+    "chicken": {
+      "etc": {
+        "red": {
+          "old-world": { "wine": "Pinot Noir (Burgundy, France)", "description": "A lighter, bright red wine with red fruit flavors and subtle earthy notes. It pairs well with roasted or grilled chicken because of its low tannins and crisp acidity, complementing the charred flavors without overwhelming the dish.", "affiliateLink": "https://example.com/" },
+          "new-world": { "wine": "Pinot Noir (California, USA)", "description": "Light and elegant, the warmer climate imparts ripe fruit flavors (like strawberry and raspberry) with softer acidity and tannins. ", "affiliateLink": "https://example.com/" },
+          },       
+        "sparkling": {
+          "old-world": { "wine": "Champagne (France)", "description": " Known for its crisp acidity, fine bubbles, and toasty notes, Champagne cleanses the palate with each sip, making it a perfect match for fried or grilled chicken.", "affiliateLink": "https://example.com/" },
+          "new-world": { "wine": "Sparkling Wine (California)", "description": " Produced using the traditional method (like Champagne), New World sparkling wines from California are often more fruit-forward with bolder citrus and apple flavors. They can still have good acidity and effervescence, but they tend to be less austere and more approachable in style, providing a lighter, fruitier contrast.", "affiliateLink": "https://example.com/" },
+          },
+        "white": {
+         "old-world": { "wine": "Chardonnay (Burgundy, France)", "description": " A full-bodied, buttery wine with flavors of citrus, stone fruit, and oak. Its creamy texture complements roasted or fried chicken, while its acidity provides balance.", "affiliateLink": "https://example.com/" },
+         "new-world": { "wine": "Chardonnay (California, USA)", "description": " Rich, with more tropical fruit flavors, and often more oak influence, resulting in a creamier, more opulent mouthfeel. The bolder style has a generous, fruit-forward character.", "affiliateLink": "https://example.com/" },
+          }, 
+      },
+      "pollo-tomato": {
+        "red": {
+          "old-world": { "wine": "Sangiovese (Tuscany, Italy)", "description": " Known for its natural acidity and bright cherry flavors, Sangiovese is a classic pairing with tomato sauces due to its ability to balance the acidity of the tomatoes and complement the savory elements without overwhelming the dish.", "affiliateLink": "https://example.com/" },
+          "new-world": { "wine": "Malbec (Argentina)", "description": " Typically known for its deep, dark fruit and bold tannins, New World versions have a softer, fruitier profile. The ripe blackberry and plum flavors of Malbec provide a rich contrast to the tanginess of tomato-based sauces, and its full body works especially well with meaty or heartier tomato dishes.", "affiliateLink": "https://example.com/" },
+          },     
+        "white": {
+          "old-world": { "wine": " Falanghina (Italy)", "description": " This Italian white from the Campania region is known for its citrus and herbal notes, with a touch of minerality. Its bright acidity and balanced flavors complement the tanginess of tomato-based sauces without overshadowing the dish.", "affiliateLink": "https://example.com/" },
+          "new-world": { "wine": "Pinot Gris (Oregon, USA)", "description": " Offers a slightly richer body than its European counterpart, with ripe pear and apple flavors, along with a touch of spice. The wine’s balanced acidity and fruit-forward profile make it a great pairing for tomato-based dishes, especially those with a bit of sweetness or spice.", "affiliateLink": "https://example.com/" },
+          },
+        "rosé": {
+          "old-world": { "wine": " Grenache Rosé (Provence, France)", "description": " This rosé has fresh berry flavors and crisp acidity, making it an excellent match for tomato-based sauces that have tangy, slightly sweet notes but aren’t too heavy.", "affiliateLink": "https://example.com/" },
+          "new-world": { "wine": " Pinot Noir Rosé (New Zealand)", "description": " With delicate strawberry and melon flavors, this New World rosé has a lighter body and higher acidity, which makes it a great choice for tomato-based dishes. It’s slightly fruitier and more aromatic than its Old World counterparts, but still offers enough freshness to balance the acidity of the tomatoes.", "affiliateLink": "https://example.com/" },
+          },
+      },
+      "pollo-cream": {
+        "red": {
+          "old-world": { "wine": " Gamay (Beaujolais, France)", "description": " Gamay, the grape of Beaujolais, is known for its light body, fresh berry flavors (strawberry, raspberry), and bright acidity. Its low tannins and juicy profile make it a great match for creamy sauces, especially when paired with lighter meats like chicken or pork. The wine's freshness balances the richness of the cream without overpowering the dish.", "affiliateLink": "https://example.com/"},
+          "new-world": { "wine": "Zinfandel (California, USA)", "description": "  Zinfandel is a fruit-forward, full-bodied red with flavors of blackberry, spice, and sometimes a touch of smoke. The ripe fruit and rich texture can complement cream sauces, particularly in heartier dishes like barbecued chicken or spicy cream-based pasta, offering a more robust and intense contrast to the sauce.", "affiliateLink": "https://example.com/" },
+        },
+        "white": { 
+          "old-world": { "wine": "Chardonnay (Burgundy, France)", "description": " A classic Burgundy Chardonnay is rich and buttery, often with oak aging, which enhances the creamy texture of the sauce. Its complexity and balanced acidity complement the richness of cream-based dishes, creating a harmonious and elegant pairing.", "affiliateLink": "https://example.com/" },
+          "new-world": { "wine": "Chardonnay (California, USA)", "description": " Regions like Napa Valley, often has richer, more tropical fruit flavors (pineapple, mango) and a fuller buttery profile, similar to Burgundy’s style. The creaminess and oak influence in these wines pair perfectly with creamy sauces, offering a slightly riper, fruitier character.", "affiliateLink": "https://example.com/" },
+        }
+      },
+      "pollo-chino": {
+        "red": {
+          "old-world": { "wine": "Pinot Noir (France, Burgundy)", "description": " The elegance and bright acidity of a Burgundy Pinot Noir makes it a good match for the complex, spicy flavors of Szechuan sauce. Its red berry notes (cherry, raspberry) are light enough not to overwhelm the dish, while its acidity and soft tannins help cut through the richness of the sauce and balance the heat without clashing with the flavors.", "affiliateLink": "https://example.com/" },
+          "new-world": { "wine": "Zinfandel (California, USA)", "description": " Zinfandel, with its ripe fruit, spicy, and sometimes smoky notes, is a great pairing for Szechuan sauce. The wine's boldness matches the intensity of the sauce, and the spice in the Zinfandel complements the heat from the sauce, creating a harmonious balance.", "affiliateLink": "https://example.com/" },
+        },     
+        "white": {
+          "old-world": { "wine": " Riesling (Germany)", "description": " German Riesling, especially off-dry styles, works beautifully with Szechuan sauce. The sweetness of the wine balances the spice, and its acidity cuts through the richness of the sauce. The wine’s floral and fruity notes (like peach and apricot) help complement the bold, savory elements of the dish, while providing a refreshing contrast to the heat.", "affiliateLink": "https://example.com/" },
+          "new-world": { "wine": "Gewürztraminer (Australia)", "description": " Gewürztraminer from Australia, with its aromatic profile and slightly sweet nature, has a perfect balance to handle the heat of Szechuan sauce. The wine’s lychee, rose petal, and spicy notes pair well with the bold spices and tangy heat in the sauce, while the touch of sweetness cools the palate.", "affiliateLink": "https://example.com/" },
+        },
+        "sparkling": {
+          "old-world": { "wine": "Champagne (France)", "description": " Champagne (especially a brut style) has the acidity and effervescence needed to cleanse the palate between bites of Szechuan-spiced dishes. The bubbles help refresh the palate, while the citrusy and toasty flavors of Champagne complement the rich, spicy, and slightly oily nature of the sauce. Its crispness contrasts nicely with the complex flavors of the dish.", "affiliateLink": "https://example.com/" },
+          "new-world": { "wine": "Sparkling Wine (California, USA)", "description": " California sparkling wines made in the traditional method (like Champagne) offer a similar experience to Champagne, with bright acidity, fine bubbles, and citrusy notes. The bubbles help cut through the richness and spiciness of the Szechuan sauce, and the slightly fruitier profile (like apple and pear) complements the dish's flavor without overwhelming it.", "affiliateLink": "https://example.com/" },
+        },   
+      },
+      "pollo-adobo": {
+        "red": {
+          "old-world": { "wine": "Tempranillo (Spain, Rioja)", "description": " Tempranillo from Rioja, with its cherry and plum flavors and moderate tannins, pairs wonderfully with Adobo. The earthy notes in Tempranillo, along with its balanced acidity, match the savory, tangy profile of Adobo, while its soft tannins won't overwhelm the dish.", "affiliateLink": "https://example.com/"},
+          "new-world": { "wine": "Zinfandel (California, USA)", "description": "Zinfandel has a rich, bold profile with flavors of blackberry, spice, and a hint of smoke. The fruitiness and spice of Zinfandel complement the savory, slightly smoky flavors of Adobo, especially when paired with pork. The wine's boldness also stands up to the dish's richness.", "affiliateLink": "https://example.com/" },
+        },
+        "white": {
+          "old-world": { "wine": "Albariño (Spain, Rías Baixas)", "description": "A refreshing and aromatic white from Spain, has crisp acidity and citrus notes that help cut through the richness and savory tang of Adobo. Its minerality and light body balance the umami in the dish without overpowering the flavors.", "affiliateLink": "https://example.com/"},
+          "new-world": { "wine": "Chardonnay (California, USA)", "description": "A Chardonnay with oak aging will have buttery and creamy textures that can pair well with the richness of Adobo, especially the pork version. The wine’s balanced acidity and flavors of tropical fruit and vanilla complement the savory and slightly tangy aspects of the dish.", "affiliateLink": "https://example.com/" },
+        },
+        "rosé": {
+          "old-world": { "wine": "Provence Rosé (France)", "description": "A light, dry rosé from Provence, with its fresh berry flavors and crisp acidity, will balance the vinegar and soy sauce elements in Adobo, making it a refreshing choice. Its minerality and delicate body provide a perfect complement to the dish’s complex, tangy flavors.", "affiliateLink": "https://example.com/"},
+          "new-world": { "wine": "Pinot Noir Rosé (Oregon, USA)", "description": " A dry, fruit-forward rosé made from Pinot Noir in Oregon offers strawberry and melon notes, with a crisp finish. This style works well with Adobo, offering refreshing acidity to balance the richness of the dish while enhancing the savory, tangy flavors.", "affiliateLink": "https://example.com/" },
+        },
+        "sparkling": { 
+          "old-world": { "wine": "Lambrusco (Italy)", "description": " Lambrusco is a lightly effervescent red wine from Italy that often has a slightly sweet profile with fruit-forward flavors (like cherry, berry, and sometimes a touch of earthiness). Its fizz helps cleanse the palate after bites of the rich, tangy Adobo sauce. The slight sweetness can also balance the vinegar in the dish while providing a refreshing contrast to the richness of pork or chicken Adobo.", "affiliateLink": "https://example.com/" },
+          "new-world": { "wine": "Sparkling Wine (California, USA)", "description": " A California sparkling wine made in the traditional method has bright acidity and fine bubbles, offering a refreshing contrast to the savory and tangy notes of Adobo. The wine’s crisp citrus and apple flavors refresh the palate between bites, complementing the rich, flavorful sauce.", "affiliateLink": "https://example.com/" },
+        }
+      }
+    },
+    "pork": {
+      "pork-grill":{ 
+        "rosé": {
+         "old-world":  { "wine": "Provence Rosé (France) ", "description": "Known for its crisp acidity and subtle red fruit notes, Provence Rosé is a versatile wine with enough structure to pair with grilled pork, offering refreshing lightness. ", "affiliateLink": "https://example.com/"},
+         "new-world":  { "wine": "Rosé (California, USA) ", "description": "A dry rosé with bright fruit flavors like strawberry and watermelon, balancing well with the smokiness of grilled pork. ", "affiliateLink": "https://example.com/"},
+        },
+        "white": {
+         "old-world":  { "wine": "Chablis (Burgundy, France) ", "description": "A crisp and mineral-driven Chardonnay from Chablis, with high acidity and a flinty character that cuts through the richness of grilled pork and cleanses the palate. ", "affiliateLink": "https://example.com/"},
+         "new-world":  { "wine": "Chardonnay (Sonoma Coast, California) ", "description": "A lightly oaked Chardonnay with balanced acidity and a touch of fruit, complementing the grilled flavors of pork without overwhelming them. ", "affiliateLink": "https://example.com/"},
+        },
+       "red": {
+         "old-world":  { "wine": "Gamay (Beaujolais, France)", "description": "A vibrant red with fresh red fruit, low tannins, and juicy acidity. It’s a great match for grilled pork, offering refreshing contrast to the smoky, charred flavors.", "affiliateLink": "https://example.com/"},
+         "new-world":  { "wine": "Syrah (California, USA)", "description": "This wine offers a bit more weight with black fruit and smoky spice, providing a great match for medium to medium-well grilled pork with a charred exterior. ", "affiliateLink": "https://example.com/"},
+        },
+      }, 
+      "pork-grill2":{ 
+        "rosé": {
+         "old-world":  { "wine": "Tavel Rosé (France) ", "description": " A structured rosé from the Southern Rhône with bold red fruit and herbaceous notes. It’s perfect for pairing with a well-done grilled pork, offering both body and refreshing acidity. ", "affiliateLink": "https://example.com/"},
+         "new-world":  { "wine": " Rosé (Australia)", "description": " Australian rosé tends to be fruit-forward with some spiciness, making it an excellent match for grilled pork with a well-done finish.", "affiliateLink": "https://example.com/"},
+        },
+        "white": {
+         "old-world":  { "wine": " Grüner Veltliner (Austria)", "description": "A crisp, slightly peppery white with vibrant acidity and hints of green fruit, it offers an interesting contrast to the charred, well-done pork.", "affiliateLink": "https://example.com/"},
+         "new-world":  { "wine": " Viognier (California, USA)", "description": "With its aromatic profile of peach, apricot, and floral notes, Viognier offers enough richness and body to complement well-done pork, especially with a touch of spice. ", "affiliateLink": "https://example.com/"},
+        },
+       "red": {
+         "old-world":  { "wine": " Zinfandel (Italy - Primitivo)", "description": " With a slightly fuller body and bold fruit flavors, Primitivo (the Italian counterpart to Zinfandel) pairs well with the deeper flavors of well-done grilled pork.", "affiliateLink": "https://example.com/"},
+         "new-world":  { "wine": " Malbec (Argentina)", "description": "  Malbec’s dark fruit flavors and soft tannins create a robust pairing with well-done grilled pork, enhancing the caramelized exterior.    ", "affiliateLink": "https://example.com/"},
+        },  
+      },
+      "pork-tomato":{ 
+        "rosé": {
+         "old-world":  { "wine": "Côtes de Provence Rosé (France)", "description": "A dry, light rosé with delicate fruit and acidity, making it an excellent complement to tomato-based pork stews.", "affiliateLink": "https://example.com/"},
+         "new-world":  { "wine": "Rosé (South Africa) ", "description": "South African rosé, often made from Syrah or Pinot Noir, offers a good balance of fruit and structure to pair with tomato-based stews.", "affiliateLink": "https://example.com/"},
+        },
+        "white": {
+         "old-world":  { "wine": "Soave (Veneto, Italy) ", "description": " A dry white wine with crisp acidity and subtle mineral notes that cut through the richness of the pork and tomato, creating a balanced pairing.", "affiliateLink": "https://example.com/"},
+         "new-world":  { "wine": "Chardonnay (California, USA)", "description": "A fuller-bodied Chardonnay with balanced acidity, it can pair well with the pork's richness and the tomato’s acidity.", "affiliateLink": "https://example.com/"},
+        },
+       "red": {
+         "old-world":  { "wine": "Barbera (Piedmont, Italy) ", "description": " Barbera’s high acidity and fruity profile work wonderfully with tomato-based dishes, complementing the stew’s tanginess while enhancing the pork.", "affiliateLink": "https://example.com/"},
+         "new-world":  { "wine": " Grenache (California, USA)", "description": " Grenache’s soft tannins and red fruit flavors work nicely with pork stews, especially with a tomato base.", "affiliateLink": "https://example.com/"},
+        },
+      },
+      "pork-cream":{ 
+        "rosé": {
+         "old-world":  { "wine": " Provence Rosé (France)", "description": " The freshness and lightness of Provence rosé complement the creamy richness of the stew, offering a crisp counterpoint.", "affiliateLink": "https://example.com/"},
+         "new-world":  { "wine": "Rosé (Chile)", "description": "  A dry rosé from Chile, made from Grenache or Syrah, offers a fruity and floral profile that matches the creaminess of the dish.", "affiliateLink": "https://example.com/"},
+        },
+        "white": {
+         "old-world":  { "wine": " Chablis (Burgundy, France)", "description": "With its minerality and crisp acidity, Chablis cuts through the richness of the cream-based stew, providing a fresh contrast to the pork. ", "affiliateLink": "https://example.com/"},
+         "new-world":  { "wine": "Chardonnay (Australia)", "description": "  A full-bodied, oaked Chardonnay from Australia has enough texture and richness to match the creaminess of the dish, while still offering enough acidity to balance.", "affiliateLink": "https://example.com/"},
+        },
+       "red": {
+         "old-world":  { "wine": "Gamay (Beaujolais, France) ", "description": " A light, fresh red with gentle acidity and berry notes that pair well with the creamy texture without overpowering the dish.", "affiliateLink": "https://example.com/"},
+         "new-world":  { "wine": "Pinot Noir (Oregon, USA) ", "description": "Oregon’s cooler climate Pinots tend to have bright acidity and earthiness, pairing well with the creamy richness of the stew. ", "affiliateLink": "https://example.com/"},
+        },
+      },
+      "pork-barbie":{ 
+        "rosé": {
+         "old-world":  { "wine": "Provence Rosé (France) ", "description": "A light and crisp rosé, with a subtle fruit profile that enhances the flavors of barbecue without overwhelming the dish.", "affiliateLink": "https://example.com/"},
+         "new-world":  { "wine": "Rosé (California, USA)", "description": "  California rosé offers vibrant fruit and a dry profile, perfect for pairing with smoky, tangy barbecue ribs.", "affiliateLink": "https://example.com/"},
+        },
+        "white": {
+         "old-world":  { "wine": "Chardonnay (Burgundy, France)", "description": " A rich, slightly oaked Chardonnay offers body and texture to complement the smokiness of the ribs.", "affiliateLink": "https://example.com/"},
+         "new-world":  { "wine": "Sauvignon Blanc (New Zealand) ", "description": "A zesty, citrus-driven Sauvignon Blanc with high acidity is refreshing enough to balance the rich, fatty nature of spare ribs. ", "affiliateLink": "https://example.com/"},
+        },
+       "red": {
+         "old-world":  { "wine": "Côtes du Rhône (Southern Rhône, France) ", "description": "A blend of Grenache, Syrah, and Mourvèdre offers the depth, spice, and fruitiness to balance the smoky, spicy ribs.", "affiliateLink": "https://example.com/"},
+         "new-world":  { "wine": "Shiraz (Australia)", "description": " Bold and spicy, Australian Shiraz pairs well with the smoky sweetness of barbecue sauce, especially when paired with pork ribs.", "affiliateLink": "https://example.com/"},
+        },
+      },
+      "lechon":{ 
+        "rosé": {
+         "old-world":  { "wine": "Tavel Rosé (France)", "description": " A bold rosé with good structure, Tavel pairs well with roasted pork dishes, providing a refreshing contrast to the richness of the meat.", "affiliateLink": "https://example.com/"},
+         "new-world":  { "wine": "Rosé (Australia) ", "description": "  A fruit-forward Australian rosé, made from Shiraz or Grenache, offers enough body and spice to pair with roasted pork, especially if there’s a smoky element.", "affiliateLink": "https://example.com/"},
+        },
+        "white": {
+         "old-world":  { "wine": "Chablis (Burgundy, France) ", "description": " Crisp and mineral-driven, Chablis' acidity and structure make it an excellent match for roasted pork, especially if the dish has some earthy or herby components.", "affiliateLink": "https://example.com/"},
+         "new-world":  { "wine": "Sauvignon Blanc (New Zealand)", "description": "The high acidity and grassy notes of Sauvignon Blanc work beautifully with roasted pork, especially with herb-based sauces.", "affiliateLink": "https://example.com/"},
+        },
+       "red": {
+         "old-world":  { "wine": "Chianti (Tuscany, Italy)", "description": " A classic Sangiovese wine with bright acidity and herbal notes, Chianti’s profile enhances roasted pork’s savory flavors.", "affiliateLink": "https://example.com/"},
+         "new-world":  { "wine": "Cabernet Sauvignon (California, USA) ", "description": "For a richer roasted pork dish, a Cabernet with its deep tannins and dark fruit will balance well with the roasted meat.", "affiliateLink": "https://example.com/"},
+        },
+      },
+    },
+    "beef": {
+      "beef-stew":{ 
+        "osé": {
+         "old-world":  { "wine": " ", "description": " ", "affiliateLink": "https://example.com/"},
+         "new-world":  { "wine": " ", "description": " ", "affiliateLink": "https://example.com/"},
+        },
+        "white": {
+         "old-world":  { "wine": "Chardonnay (Burgundy, France)", "description": "A more restrained, mineral-driven Chardonnay from Burgundy can offer a nice contrast to beef stew, especially if the stew is lighter or has a more delicate broth. The wine’s acidity and subtle fruit notes balance the richness of the meat.", "affiliateLink": "https://example.com/"},
+         "new-world":  { "wine": "Chardonnay (California, USA)", "description": "If you’re serving a beef stew with a rich, creamy base or root vegetables, a fuller-bodied, oaked Chardonnay from California can pair well, offering enough body and richness to complement the dish.", "affiliateLink": "https://example.com/"},
+        },
+       "red": {
+         "old-world":  { "wine": "Châteauneuf-du-Pape (Southern Rhône, France) ", "description": " A blend of Grenache, Syrah, and Mourvèdre, this wine offers dark fruit, earthy complexity, and spice. It pairs well with beef stew, especially if the stew has a tomato-based or herbed sauce, as it can enhance the depth of flavor and stand up to the richness of the dish.", "affiliateLink": "https://example.com/"},
+         "new-world":  { "wine": "Cabernet Sauvignon (California, USA)", "description": "With its bold tannins, dark fruit, and hints of spice, a California Cabernet Sauvignon works well with beef stew, especially if it contains hearty ingredients like root vegetables or a rich gravy. The wine's structure balances the richness of the meat.", "affiliateLink": "https://example.com/"},
+        },
+      },
+      "beef-braise":{ 
+        "osé": {
+         "old-world":  { "wine": " ", "description": " ", "affiliateLink": "https://example.com/"},
+         "new-world":  { "wine": " ", "description": " ", "affiliateLink": "https://example.com/"},
+        },
+        "white": {
+         "old-world":  { "wine": "Chablis (Burgundy, France)", "description": "If the braised beef has a lighter, less rich sauce, Chablis—a crisp, mineral-driven Chardonnay—can provide refreshing acidity to balance the richness of the meat.", "affiliateLink": "https://example.com/"},
+         "new-world":  { "wine": "Chardonnay (Sonoma, California, USA)", "description": "A fuller-bodied, oaked Chardonnay can pair with the richness of braised beef, especially if the dish has a creamy or buttery sauce. The wine’s roundness and oak influence complement the depth of flavor in the meat.", "affiliateLink": "https://example.com/"},
+        },
+       "red": {
+         "old-world":  { "wine": "Chianti Classico (Tuscany, Italy) ", "description": "Chianti's high acidity and herbal, cherry flavors work well with the deep flavors of braised beef, especially if the dish has an Italian influence (such as a tomato-based braise). The wine's acidity helps balance the richness of the meat. ", "affiliateLink": "https://example.com/"},
+         "new-world":  { "wine": "Cabernet Sauvignon (Napa Valley, USA) ", "description": "A bold Cabernet Sauvignon from Napa Valley, with its dark fruit and firm tannins, is ideal for braised beef. The structure and depth of the wine pair well with the hearty, rich flavors of the dish, enhancing the overall experience. ", "affiliateLink": "https://example.com/"},
+        },
+      },
+      "beef-tapa":{ 
+        "rosé": {
+         "old-world":  { "wine": "Tavel Rosé (Southern Rhône, France)", "description": "Tavel is known for its rich, full-bodied rosé that can stand up to the robust flavors of beef tapa. Its depth of flavor and fruitiness, along with a touch of spice, complement the savory, slightly smoky beef, making it a refreshing yet flavorful pairing. ", "affiliateLink": "https://example.com/"},
+         "new-world":  { "wine": "Rosé (California, USA)", "description": " A dry, fruit-forward rosé from California with hints of strawberry, watermelon, and citrus works well with the charred and savory flavors of beef tapa. Its refreshing acidity and slight herbal notes offer a nice contrast to the richness of the beef.", "affiliateLink": "https://example.com/"},
+        },
+        "white": {
+         "old-world":  { "wine": " Albariño (Rías Baixas, Spain)", "description": "Albariño, with its bright acidity and citrusy, floral notes, pairs wonderfully with beef tapa, especially if it's marinated in vinegar or citrus. Its refreshing quality contrasts nicely with the richness of the beef while complementing the savory flavors. ", "affiliateLink": "https://example.com/"},
+         "new-world":  { "wine": " Chardonnay (California, USA)", "description": " A fruit-forward, unoaked Chardonnay from California can provide a nice balance to the savory and slightly spicy flavors of beef tapa, offering a refreshing, citrusy contrast without overpowering the dish.", "affiliateLink": "https://example.com/"},
+        },
+       "red": {
+         "old-world":  { "wine": "Tempranillo (Rioja, Spain) ", "description": " With its earthy, spicy character and good acidity, Tempranillo, especially from Rioja, is an excellent choice for beef tapa. It enhances the grilled, savory flavors of the dish while complementing any marinated elements (like soy sauce or vinegar) with its tangy fruit and subtle spice.", "affiliateLink": "https://example.com/"},
+         "new-world":  { "wine": "Zinfandel (California, USA)", "description": " Zinfandel’s bold fruit and peppery spice complement the savory and slightly charred flavors of beef tapa, especially if it's grilled or has a slightly spicy marinade. The wine’s richness balances the dish's intensity without overwhelming it. ", "affiliateLink": "https://example.com/"},
+        },
+      },
+    },
+    "game": {
+      "small-roast":{ 
+        "osé": {
+         "old-world":  { "wine": "X ", "description": " ", "affiliateLink": "https://example.com/"},
+         "new-world":  { "wine": "X ", "description": " ", "affiliateLink": "https://example.com/"},
+        },
+        "white": {
+         "old-world":  { "wine": "Chablis (Burgundy, France) ", "description": "  A crisp, mineral-driven Chardonnay that works well with roasted game birds, especially if they have a light seasoning. Its acidity helps cut through the richness without overpowering the delicate flavors.", "affiliateLink": "https://example.com/"},
+         "new-world":  { "wine": "Chardonnay (Sonoma, California, USA)", "description": "A lightly oaked, fruit-forward Chardonnay can enhance the flavors of roasted meats like duck or pheasant while balancing the richness with its acidity.", "affiliateLink": "https://example.com/"},
+        },
+       "red": {
+         "old-world":  { "wine": "Gamay (Beaujolais, France) ", "description": " A vibrant, fruit-forward red wine with juicy red berry flavors and soft tannins, Gamay is an excellent match for roasted rabbit or pheasant, offering freshness that contrasts well with the richness of roasted meats. ", "affiliateLink": "https://example.com/"},
+         "new-world":  { "wine": "Pinot Noir (California, USA)", "description": "A slightly fruitier, more accessible style than Burgundy Pinot Noir, Californian Pinot works well with roasted game, offering balance between fruitiness and acidity.", "affiliateLink": "https://example.com/"},
+        },
+      },
+      "small-braise":{ 
+        "osé": {
+         "old-world":  { "wine": " ", "description": " ", "affiliateLink": "https://example.com/"},
+         "new-world":  { "wine": " ", "description": " ", "affiliateLink": "https://example.com/"},
+        },
+        "white": {
+         "old-world":  { "wine": "Chablis (Burgundy, France) ", "description": " Chablis’ high acidity and minerality make it a great match for braised duck or pheasant, offering a refreshing counterpoint to the richness of the meat.", "affiliateLink": "https://example.com/"},
+         "new-world":  { "wine": "Chardonnay (Australia)", "description": "A rich, oaked Chardonnay from Australia brings enough weight to pair with the earthy, tender flavors of braised game, offering a touch of fruit and spice to complement the dish.", "affiliateLink": "https://example.com/"},
+        },
+       "red": {
+         "old-world":  { "wine": "Bordeaux (France) – Merlot-based blend:", "description": "The plush tannins and dark fruit in Bordeaux reds (particularly from the Right Bank like Saint-Émilion) make them an excellent pairing for braised game meats, such as braised rabbit or duck, providing structure and depth to complement the dish's richness. ", "affiliateLink": "https://example.com/"},
+         "new-world":  { "wine": " Zinfandel (California, USA)", "description": " Bold, fruit-forward, and spicy, Zinfandel complements the deep, savory flavors of braised game like duck and rabbit, enhancing the complexity of the dish.", "affiliateLink": "https://example.com/"},
+        },
+      },
+      "small-stew":{ 
+        "osé": {
+         "old-world":  { "wine": " ", "description": " ", "affiliateLink": "https://example.com/"},
+         "new-world":  { "wine": " ", "description": " ", "affiliateLink": "https://example.com/"},
+        },
+        "white": {
+         "old-world":  { "wine": "Grüner Veltliner (Austria) ", "description": " With its zesty acidity and subtle spice, Grüner Veltliner pairs well with stewed rabbit or pheasant, especially if the dish has herbs or spices that need a wine with enough freshness to cut through the richness.", "affiliateLink": "https://example.com/"},
+         "new-world":  { "wine": "Chardonnay (California, USA) ", "description": " A rich, oaked Chardonnay complements stewed game meats, particularly duck, adding a buttery texture that pairs well with the savory nature of the stew. ", "affiliateLink": "https://example.com/"},
+        },
+       "red": {
+         "old-world":  { "wine": "Tempranillo (Rioja, Spain) ", "description": "A Tempranillo-based wine from Rioja has the structure and acidity to match stews, with flavors of dark fruit and earthiness that pair well with long-cooked meats like rabbit or duck.", "affiliateLink": "https://example.com/"},
+         "new-world":  { "wine": "Syrah (Australia) ", "description": "The bold fruit and peppery spice of an Australian Shiraz balance the deep flavors of stewed wild boar or pheasant, providing structure to stand up to the richness of the dish.", "affiliateLink": "https://example.com/"},
+        },
+      },
+      "duck-orange":{ 
+        "osé": {
+         "old-world":  { "wine": " ", "description": " ", "affiliateLink": "https://example.com/"},
+         "new-world":  { "wine": " ", "description": " ", "affiliateLink": "https://example.com/"},
+        },
+        "white": {
+         "old-world":  { "wine": "Chablis (Burgundy, France)", "description": " The high acidity and minerality of Chablis work well with the richness of the duck, while its subtlety doesn’t overpower the sweet-tangy orange sauce.", "affiliateLink": "https://example.com/"},
+         "new-world":  { "wine": "Riesling (Washington State, USA)", "description": " A semi-dry Riesling’s sweetness and acidity work beautifully with the balance of flavors in Duck à l'Orange, especially if the sauce is on the sweeter side.", "affiliateLink": "https://example.com/"},
+        },
+       "red": {
+         "old-world":  { "wine": "Pinot Noir (Burgundy, France) ", "description": " The light body and bright acidity of Burgundy Pinot Noir work perfectly with the sweetness and acidity of the orange sauce in Duck à l'Orange, while the wine's earthy notes complement the richness of the duck.", "affiliateLink": "https://example.com/"},
+         "new-world":  { "wine": "Pinot Noir (Oregon, USA)", "description": "Oregon Pinot Noir's delicate fruit and balanced acidity make it a great choice for pairing with Duck à l'Orange, harmonizing with the sauce and enhancing the richness of the duck. ", "affiliateLink": "https://example.com/"},
+        },
+      },
+      "big-braise":{ 
+        "osé": {
+         "old-world":  { "wine": " ", "description": " ", "affiliateLink": "https://example.com/"},
+         "new-world":  { "wine": " ", "description": " ", "affiliateLink": "https://example.com/"},
+        },
+        "white": {
+         "old-world":  { "wine": "Grüner Veltliner (Austria) ", "description": "A versatile white with herbal and peppery notes, Grüner Veltliner’s acidity and structure make it a good match for braised venison, cutting through the richness of the meat while enhancing its flavors.", "affiliateLink": "https://example.com/"},
+         "new-world":  { "wine": "Chardonnay (Sonoma Coast, California)", "description": " A full-bodied Chardonnay with a balance of oak and acidity pairs nicely with braised venison or wild boar, offering richness that matches the hearty flavors of the dish.", "affiliateLink": "https://example.com/"},
+        },
+       "red": {
+         "old-world":  { "wine": " Barolo (Piedmont, Italy)", "description": "Nebbiolo-based Barolo offers bold tannins, high acidity, and complex flavors of dark fruit, earth, and herbs, which pair beautifully with the intense, rich flavors of braised venison or wild boar. ", "affiliateLink": "https://example.com/"},
+         "new-world":  { "wine": " Zinfandel (California, USA)", "description": "A full-bodied, spicy Zinfandel complements the wild, robust flavors of braised venison or wild boar, providing enough fruit and spice to enhance the dish. ", "affiliateLink": "https://example.com/"},
+        },
+      },
+      "big-stew":{ 
+        "osé": {
+         "old-world":  { "wine": " ", "description": " ", "affiliateLink": "https://example.com/"},
+         "new-world":  { "wine": " ", "description": " ", "affiliateLink": "https://example.com/"},
+        },
+        "white": {
+         "old-world":  { "wine": "Riesling (Germany) ", "description": "A medium-bodied Riesling with its refreshing acidity and slight sweetness pairs nicely with stewed venison or wild boar, especially if the dish has a slightly sweet element or is spiced.", "affiliateLink": "https://example.com/"},
+         "new-world":  { "wine": "Chardonnay (New Zealand)", "description": "The fruit-forward, balanced acidity of New Zealand Chardonnay can complement the richness of stewed meats, particularly wild boar or venison, with its body and crisp finish.", "affiliateLink": "https://example.com/"},
+        },
+       "red": {
+         "old-world":  { "wine": "Bordeaux (France) – Cabernet Sauvignon-based blend ", "description": "A full-bodied Bordeaux red works well with the depth and richness of stewed venison or wild boar, offering dark fruit, tannin, and earthiness that complement the stew’s flavors.", "affiliateLink": "https://example.com/"},
+         "new-world":  { "wine": " Malbec (Argentina)", "description": " Malbec’s dark fruit, soft tannins, and spice profile enhance the flavors of stewed wild boar or venison, providing enough body to complement the dish’s richness.", "affiliateLink": "https://example.com/"},
+        },
+      },
+       "big-cream":{ 
+        "osé": {
+         "old-world":  { "wine": " ", "description": " ", "affiliateLink": "https://example.com/"},
+         "new-world":  { "wine": " ", "description": " ", "affiliateLink": "https://example.com/"},
+        },
+        "white": {
+         "old-world":  { "wine": "Chardonnay (Burgundy, France) ", "description": "  A classic oaked Chardonnay from Burgundy works with the richness of cream sauces, particularly with venison, adding complexity and enough body to match the dish.", "affiliateLink": "https://example.com/"},
+         "new-world":  { "wine": " Chardonnay (California, USA)", "description": "A rich, oaked California Chardonnay pairs wonderfully with cream-based venison or wild boar dishes, offering a buttery texture and a bit of spice to complement the sauce. ", "affiliateLink": "https://example.com/"},
+        },
+       "red": {
+         "old-world":  { "wine": "Barbaresco (Piedmont, Italy) ", "description": " Nebbiolo-based Barbaresco, with its bright acidity, tannins, and dark fruit, offers a great pairing for cream-based venison or wild boar dishes, cutting through the richness without being overwhelming.", "affiliateLink": "https://example.com/"},
+         "new-world":  { "wine": "Merlot (California, USA)", "description": "A smooth, fruit-forward Merlot is a great choice with cream-based venison or wild boar, offering soft tannins and plum flavors that complement the creaminess of the sauce.", "affiliateLink": "https://example.com/"},
+        },
+      },
+      "big-grill":{ 
+        "osé": {
+         "old-world":  { "wine": " ", "description": " ", "affiliateLink": "https://example.com/"},
+         "new-world":  { "wine": " ", "description": " ", "affiliateLink": "https://example.com/"},
+        },
+        "white": {
+         "old-world":  { "wine": "Grüner Veltliner (Austria) ", "description": "A crisp and peppery Grüner Veltliner cuts through the richness of grilled venison, offering herbal and citrus notes that brighten up the dish.", "affiliateLink": "https://example.com/"},
+         "new-world":  { "wine": "Chardonnay (Sonoma Coast, California, USA)", "description": "A California Chardonnay with enough body and acidity works nicely with grilled venison, especially if it’s accompanied by a rich sauce or grilled vegetables.", "affiliateLink": "https://example.com/"},
+        },
+       "red": {
+         "old-world":  { "wine": "Chianti (Tuscany, Italy) ", "description": "  A vibrant Chianti with acidity and herbal notes complements grilled venison’s smoky flavor, while the wine's tannins balance the grilled richness of the meat.", "affiliateLink": "https://example.com/"},
+         "new-world":  { "wine": "Cabernet Sauvignon (California, USA)", "description": "A bold, tannin-heavy California Cabernet Sauvignon is perfect for grilled venison, offering dark fruit and structure to complement the meat’s robust flavor.", "affiliateLink": "https://example.com/"},
+        },
+      },
+    },
+    "lamb": {
+      "lamb-roast":{ 
+        "rosé": {
+         "old-world":  { "wine": "Tavel Rosé (France)", "description": " A bold, structured rosé from Tavel (Southern Rhône) provides enough complexity and acidity to balance roasted lamb, especially when the lamb is flavored with herbs and spices.", "affiliateLink": "https://example.com/"},
+         "new-world":  { "wine": "Rosé (California, USA) ", "description": "A fruity yet dry California rosé works well with roasted lamb, offering freshness to cut through the richness. ", "affiliateLink": "https://example.com/"},
+        },
+        "white": {
+         "old-world":  { "wine": "Chardonnay (Burgundy, France)", "description": " A fuller-bodied, oaked Burgundy Chardonnay has enough weight to pair with roasted lamb, offering balance with its richness while the acidity cuts through the lamb’s fat.", "affiliateLink": "https://example.com/"},
+         "new-world":  { "wine": "Chardonnay (Sonoma, California, USA) ", "description": "A slightly oaked California Chardonnay with good acidity and a buttery texture can complement the roasted leg of lamb, especially if it has a rich sauce.", "affiliateLink": "https://example.com/"},
+        },
+       "red": {
+         "old-world":  { "wine": "Syrah (Northern Rhône, France) ", "description": " With deep flavors of black fruit, olive, and a touch of pepper, a Northern Rhône Syrah (like from Côte-Rôtie) complements the savory and herbal flavors of roasted lamb.", "affiliateLink": "https://example.com/"},
+         "new-world":  { "wine": "Shiraz (Australia) ", "description": "Australian Shiraz, with its full-bodied nature and peppery spice, enhances the roasted lamb's deep flavors, especially if it’s roasted with spices or a glaze. ", "affiliateLink": "https://example.com/"},
+        },
+      },
+      "lamb-chop1":{ 
+        "rosé": {
+         "old-world":  { "wine": "Provence Rosé (France)", "description": " A light, crisp rosé from Provence with delicate fruit and bright acidity makes an elegant pairing with rare lamb chops, providing freshness without overwhelming the dish.", "affiliateLink": "https://example.com/"},
+         "new-world":  { "wine": "Rosé (California, USA)", "description": " A slightly fruitier, dry rosé from California offers berry notes and crispness that pair beautifully with the tender, juicy meat.", "affiliateLink": "https://example.com/"},
+        },
+        "white": {
+         "old-world":  { "wine": "Grüner Veltliner (Austria) ", "description": " A crisp and peppery white, Grüner Veltliner’s acidity and citrusy notes help cut through the richness of the lamb while balancing the juiciness of the rare meat.", "affiliateLink": "https://example.com/"},
+         "new-world":  { "wine": "Sauvignon Blanc (New Zealand) ", "description": " The zesty acidity and grassy, citrus notes of New Zealand Sauvignon Blanc provide a refreshing contrast to the richness of rare lamb chops.", "affiliateLink": "https://example.com/"},
+        },
+       "red": {
+         "old-world":  { "wine": "Châteauneuf-du-Pape (Southern Rhône, France) ", "description": " A blend dominated by Grenache, this wine has ripe fruit, pepper, and a touch of earthiness, matching the tenderness of rare lamb chops.", "affiliateLink": "https://example.com/"},
+         "new-world":  { "wine": "Pinot Noir (Oregon, USA) ", "description": "A fruit-forward Oregon Pinot with bright acidity and soft tannins matches perfectly with the delicate flavors of lamb chops cooked rare or medium-rare. ", "affiliateLink": "https://example.com/"},   
+        },
+      },
+      "lamb-chop2":{ 
+        "rosé": {
+         "old-world":  { "wine": "Tavel Rosé (France)", "description": "A more structured rosé, with good body and acidity, works well with lamb chops cooked medium to medium-well, offering both fruitiness and balance to the dish. ", "affiliateLink": "https://example.com/"},
+         "new-world":  { "wine": "Rosé (South Africa)", "description": " South African rosé, made from Shiraz or Grenache, offers a balance of fruit and spice that complements medium-cooked lamb chops.", "affiliateLink": "https://example.com/"},
+        },
+        "white": {
+         "old-world":  { "wine": " Chablis (Burgundy, France)", "description": " The crisp, mineral-driven Chablis provides acidity and freshness, cutting through the richness of medium-cooked lamb chops.", "affiliateLink": "https://example.com/"},
+         "new-world":  { "wine": " Chardonnay (Sonoma Coast, USA)", "description": "With a balance of fruit and acidity, a California Chardonnay has enough structure to match medium to medium-well lamb, especially if there’s a rich sauce or seasoning involved. ", "affiliateLink": "https://example.com/"},
+        },
+       "red": {
+         "old-world":  { "wine": "Rioja (Spain) ", "description": "Rioja’s Tempranillo-based wines offer bright acidity, red fruit, and a hint of earthiness, making it a good match for lamb chops cooked medium to medium-well, where the meat is slightly firmer but still tender.", "affiliateLink": "https://example.com/"},
+         "new-world":  { "wine": " Zinfandel (California, USA)", "description": " Zinfandel’s bold fruit and spiciness enhance the richer flavors of medium-cooked lamb, providing enough structure to pair with slightly firmer meat. ", "affiliateLink": "https://example.com/"},   
+        },
+      },
+      "lamb-chop3":{ 
+        "rosé": {
+         "old-world":  { "wine": "Tavel Rosé (France)", "description": "With its full body and bold fruit, Tavel’s rosé offers enough weight and structure to pair well with well-done lamb chops, especially if there’s a smoky or spiced crust. ", "affiliateLink": "https://example.com/"},
+         "new-world":  { "wine": "Rosé (Australia)", "description": "Australian rosé, often made from Shiraz or Grenache, has enough depth to complement well-done lamb with its fruit and spice.", "affiliateLink": "https://example.com/"},
+        },
+        "white": {
+         "old-world":  { "wine": "Grüner Veltliner (Austria)", "description": "The high acidity and herbaceous quality of Grüner Veltliner work well with well-done lamb, especially if it has been seasoned with herbs or has a bit of spiciness.", "affiliateLink": "https://example.com/"},
+         "new-world":  { "wine": "Viognier (California, USA)", "description": "A fuller-bodied Viognier offers floral and fruit notes, and its richness pairs nicely with the bold flavors of well-done lamb.", "affiliateLink": "https://example.com/"},
+        },
+       "red": {
+         "old-world":  { "wine": "Tempranillo (Ribera del Duero, Spain)", "description": "The bold, tannic structure of Ribera del Duero wines and their deep, dark fruit flavors work well with well-done lamb chops, which can have a slightly more charred, savory profile.", "affiliateLink": "https://example.com/"},
+         "new-world":  { "wine": "Cabernet Sauvignon (California, USA) ", "description": "A full-bodied, tannin-heavy Cabernet Sauvignon is a great match for well-done lamb, offering strong fruit and structure that stands up to the robust flavors of the meat. ", "affiliateLink": "https://example.com/"},   
+        },
+      },
+      "lamb-stew":{ 
+        "rosé": {
+         "old-world":  { "wine": "Tavel Rosé (France)", "description": "Tavel rosé's body and complexity can handle the richness of a lamb stew, providing a refreshing yet complementary pairing.", "affiliateLink": "https://example.com/"},
+         "new-world":  { "wine": "Rosé (South Africa)", "description": " With a spiced, fruit-forward character, a South African rosé pairs wonderfully with lamb stew, especially if the stew has aromatic spices or a rich, tomato-based sauce.", "affiliateLink": "https://example.com/"},
+        },
+        "white": {
+         "old-world":  { "wine": "Chablis (Burgundy, France) ", "description": " The crisp, mineral qualities of Chablis make a great contrast to the richness of a lamb stew, while its acidity cleanses the palate between bites.", "affiliateLink": "https://example.com/"},
+         "new-world":  { "wine": "Chardonnay (California, USA)", "description": "A rich, oaked Chardonnay pairs beautifully with lamb stew, adding complexity to the dish while providing balance to its flavors.", "affiliateLink": "https://example.com/"},
+        },
+       "red": {
+         "old-world":  { "wine": "Côtes du Rhône (Southern Rhône, France) ", "description": "  A Grenache-based blend with dark fruit and spicy flavors, perfect for pairing with a lamb stew that has rich, savory flavors.","affiliateLink": "https://example.com/"},
+         "new-world":  { "wine": " Zinfandel (California, USA)", "description": " Zinfandel’s rich, spicy fruit and bold body match the hearty flavors of a lamb stew, particularly if it’s braised or served with a rich sauce.", "affiliateLink": "https://example.com/"},   
+        },
+      },
+    },
+    "steak": {
+      "rare":{ 
+        "osé": {
+         "old-world":  { "wine": " ", "description": " ", "affiliateLink": "https://example.com/"},
+         "new-world":  { "wine": " ", "description": " ", "affiliateLink": "https://example.com/"},
+        },
+        "white": {
+         "old-world":  { "wine": "White Bordeaux (Sauvignon Blanc + Sémillon Blend) ", "description": " A White Bordeaux from the Graves region (or Pessac-Léognan) can be a surprising but wonderful pairing. The Sauvignon Blanc adds crisp acidity, while the Sémillon brings richness and a slightly waxy texture, which pairs well with rare steak. The wine’s fresh citrus and herbal notes will enhance the meat’s flavor without overwhelming it.", "affiliateLink": "https://example.com/"},
+         "new-world":  { "wine": "Sauvignon Blanc (New Zealand) ", "description": "A New Zealand Sauvignon Blanc is a vibrant, crisp choice with bright citrus, gooseberry, and herbaceous notes. Its acidity cuts through the richness of the steak without overpowering the delicate flavors of rare steak.", "affiliateLink": "https://example.com/"},
+        },
+       "red": {
+         "old-world":  { "wine": "Bordeaux Blend-Left Bank (Cabernet Sauvignon dominant) ", "description": "A wine like Cabernet Sauvignon-dominant Bordeaux (e.g., Margaux, Pauillac) is a classic pairing. These wines are full-bodied, with tannins that work well with the tenderness and juiciness of rare steak, enhancing the rich flavors of the beef while providing enough structure to complement the meat. ", "affiliateLink": "https://example.com/"},
+         "new-world":  { "wine": " Meritage", "description": " A Cabernet Sauvignon-based Meritage from California or Washington state is another excellent choice. The dark fruit flavors, moderate tannins, and acidity pair beautifully with the natural flavors of rare steak, making for a harmonious experience.", "affiliateLink": "https://example.com/"},   
+        },
+      },
+      "medium":{ 
+        "white": {
+         "old-world":  { "wine": "White Rhône Blend (Marsanne, Roussanne, Viognier) ", "description": "A blend from the Rhône Valley (e.g., Château de Beaucastel or Condrieu) will have floral, stone fruit, and honeyed notes, offering depth and complexity to match the flavors of a medium steak. Its richness and minerality will balance the meat’s texture. ", "affiliateLink": "https://example.com/"},
+         "new-world":  { "wine": "Viognier (California or Australia) ", "description": " Viognier from California or Australia is aromatic and fruity, with a smooth, full-bodied texture that pairs well with the richness of a medium steak. The wine’s floral, peach, and apricot notes will enhance the flavors without being too overpowering. ", "affiliateLink": "https://example.com/"},
+        },
+        "X": {
+         "old-world":  { "wine": " ", "description": " ", "affiliateLink": "https://example.com/"},
+         "new-world":  { "wine": " ", "description": " ", "affiliateLink": "https://example.com/"},
+        },
+       "red": {
+         "old-world":  { "wine": "Bordeaux Blend-Saint-Émilion (Merlot dominant) ", "description": "Offers roundness and soft tannins, with flavors of ripe fruit and earth that work well with the firm texture and richness of medium steak. The wine’s acidity will also help balance any fattiness in the meat. ", "affiliateLink": "https://example.com/"},
+         "new-world":  { "wine": "Red Blend (Washington State, USA) ", "description": "A rich, fruit-forward blend from Washington State, like those made with Cabernet Sauvignon and Syrah, pairs well with medium steak. The combination of fruit intensity and spice complements the flavors of the steak while keeping the overall pairing balanced.", "affiliateLink": "https://example.com/"},   
+        },
+      },
+      "med-well":{ 
+        "osé": {
+         "old-world":  { "wine": " ", "description": " ", "affiliateLink": "https://example.com/"},
+         "new-world":  { "wine": " ", "description": " ", "affiliateLink": "https://example.com/"},
+        },
+        "white": {
+         "old-world":  { "wine": "Chardonnay (Burgundy, France - Oaked) ", "description": "A classic oaked Burgundy Chardonnay from regions like Meursault or Puligny-Montrachet will have enough body and complexity to match a well-done steak. The rich, buttery, and nutty flavors of the wine will complement the steak’s smoky and charred notes, making for a satisfying pairing.", "affiliateLink": "https://example.com/"},
+         "new-world":  { "wine": "Gewürztraminer (California, Oregon) ", "description": "A Gewürztraminer offers exotic spice, floral, and fruity notes, with a rich texture that pairs well with the charred and smoky flavors of a well-done steak. Its slight sweetness and bold flavors can enhance the steak’s caramelized crust without overwhelming the dish.", "affiliateLink": "https://example.com/"},
+        },
+       "red": {
+         "old-world":  { "wine": " Côtes du Rhône (Grenache-based blends)", "description": "With a base of Grenache, Syrah, and Mourvèdre, offers a more approachable pairing for medium-well to well-done steaks. These wines tend to be fruit-forward, with a peppery spice and moderate tannins that work well with the more robust flavors of a well-done steak.", "affiliateLink": "https://example.com/"},
+         "new-world":  { "wine": "Meritage (Napa Valley, USA)", "description": "Typically a Cabernet Sauvignon-dominant blend that features bold fruit, robust tannins, and smoky undertones. This wine pairs wonderfully with well-done steaks, offering enough body and structure to complement the meat's charred, caramelized exterior.", "affiliateLink": "https://example.com/"},   
+        },
+      },
+    },
+    "dessert": {
+      "chocolate":{ 
+        "dessert": {
+         "old-world":  { "wine": "Ruby Port (Porto, Portugal) ", "description": "Full-bodied and fruity, with blackberry, plum, and cherry flavors that complement rich chocolate. ", "affiliateLink": "https://example.com/"},
+        },
+        "white": {
+         "new-world":  { "wine": "Late Harvest Riesling (Columbia Valley, USA) ", "description": "Sweet and aromatic, with apricot and honey flavors, it pairs nicely with chocolate desserts, especially those with fruit elements.  ", "affiliateLink": "https://example.com/"},
+        },
+       "red": {
+         "old-world":  { "wine": "Syrah (France) ", "description": "Full-bodied, with dark fruit and chocolate spice, perfect for chocolate cakes or chocolate truffles. ", "affiliateLink": "https://example.com/"},
+         "new-world":  { "wine": "Zinfandel (California, USA) ", "description": " Rich, spicy, and fruit-forward, with dark berry and pepper flavors that complement dark chocolate. ", "affiliateLink": "https://example.com/"},
+        },
+      },
+      "custard":{ 
+        "white": {
+         "old-world":  { "wine": "Tokaji (Hungary) ", "description": "Sweet and vibrant, with flavors of honey, orange, and nuts, complementing the richness of custards. ", "affiliateLink": "https://example.com/"},
+        },
+        "dessert": {
+         "old-world":  { "wine": "Madeira (Malmsey)(Madeira Islands, Portugal) ", "description": "Sweet with caramel and nutty flavors, ideal with custards and rich cream-based desserts. ", "affiliateLink": "https://example.com/"},
+        },
+       "red": {
+         "old-world":  { "wine": "Pinot Noir (Sweet or Dessert Style) (Burgundy, France) ", "description": "Light, fruity, and delicate with notes of red berries, ideal for pairing with custard-based desserts like vanilla tarts. ", "affiliateLink": "https://example.com/"},
+         "new-world":  { "wine": "Pinot Noir (Sweet or Dessert Style) (Oregon, USA) ", "description": "Almost similar to France ", "affiliateLink": "https://example.com/"},
+        },
+      },
+      "nutty":{ 
+        "sparkling": {
+         "old-world":  { "wine": "Moscato d'Asti (Piedmont, Italy)", "description": "Light, bubbly, and fruity, perfect with nutty desserts like baklava or almond cake.", "affiliateLink": "https://example.com/"},
+        },  
+        "dessert": {
+         "old-world":  { "wine": "Pedro Ximénez (PX) Sherry (Jerez, Spain) ", "description": "Deeply sweet, with raisin and fig notes, ideal for nutty, sticky desserts like baklava or pecan pie.", "affiliateLink": "https://example.com/"},
+        },
+        "white": {
+         "new-world":  { "wine": "Late Harvest Chenin Blanc (South Africa) ", "description": "Rich and honeyed, it pairs well with nut-based pastries and cakes. ", "affiliateLink": "https://example.com/"},
+        },
+       "red": {
+         "old-world":  { "wine": "Port (Ruby or Tawny) (Porto, Portugal)", "description": "The rich fruit and nut flavors of Port pair wonderfully with nut-based cakes or caramel desserts. ", "affiliateLink": "https://example.com/"},
+         "new-world":  { "wine": "Grenache (Australia) ", "description": "Light and fruity, with berry and subtle spice flavors, this can pair well with hazelnut or almond desserts.", "affiliateLink": "https://example.com/"},
+        },
+      },
+      "fruit":{ 
+        "dessert": {
+         "old-world":  { "wine": "Muscat Beaumes-de-Venise (Beaumes-de-Venise, France) ", "description": "Sweet and fruity, with orange blossom and peach flavors, ideal for fruit tarts and fruit salads. ", "affiliateLink": "https://example.com/"},
+        },  
+        "sparkling": {  
+         "old-world":  { "wine": "Moscato d'Asti (Piedmont, Italy) ", "description": "Lightly sparkling, with flavors of peach and citrus, making it a great choice for fruit-based desserts. ", "affiliateLink": "https://example.com/"},
+        },
+        "white": {
+         "old-world":  { "wine": "Late Harvest Riesling (Germany) ", "description": "Sweet, with apricot and peach notes, which complement fruit tarts or poached pears. ", "affiliateLink": "https://example.com/"},
+         "new-world":  { "wine": "Late Harvest Riesling (USA) ", "description": "Almost similar to Germany.", "affiliateLink": "https://example.com/"},
+        },
+        "red": {
+         "old-world":  { "wine": "Gamay (Beaujolais, France) ", "description": "Light and fruity, with fresh red fruit flavors, it pairs well with apple or berry-based desserts.", "affiliateLink": "https://example.com/"},
+         "new-world":  { "wine": "Pinot Noir (Oregon, USA) ", "description": "Light and fruity, with raspberry and cherry flavors, perfect for pairing with berry-based tarts or poached fruit. ", "affiliateLink": "https://example.com/"},
+        },
+      },
+      "caramel":{ 
+        "dessert": {
+         "old-world":  { "wine": "Vin Santo (Tuscany, Italy) ", "description": "Sweet and nutty, it pairs beautifully with caramel or spiced desserts.", "affiliateLink": "https://example.com/"},
+        },
+        "white": {
+         "old-world":  { "wine": "Tokaji (Hungary)", "description": "Rich and honeyed, with citrus and nutty flavors that complement spiced and caramel desserts.", "affiliateLink": "https://example.com/"},
+        },
+       "red": {
+         "old-world":  { "wine": "Syrah/Shiraz (France)", "description": "Spicy with dark fruit, it works well with caramel and spice-based desserts.", "affiliateLink": "https://example.com/"},
+         "new-world":  { "wine": "Zinfandel (California, USA)", "description": "Rich, with jammy fruit and spice notes, it pairs perfectly with gingerbread or caramel cakes.", "affiliateLink": "https://example.com/"},
+        },
+      },
+      "citrus":{ 
+        "dessert": {
+         "old-world":  { "wine": "Amontillado Sherry (Jerez, Spain)", "description": "Medium-sweet with nutty and citrus notes, it’s great with citrus-based desserts.", "affiliateLink": "https://example.com/"},
+         "new-world":  { "wine": " ", "description": " ", "affiliateLink": "https://example.com/"},
+        },
+        "sparkling": {
+         "old-world":  { "wine": "Moscato d'Asti (Piedmont, Italy)", "description": "With its fresh, light, fruity character, it enhances the brightness of citrus desserts.", "affiliateLink": "https://example.com/"},
+        },
+        "white": {
+         "old-world":  { "wine": "Late Harvest Riesling (Germany)", "description": "Sweet with crisp acidity, great with lemon sorbet or lime tarts.", "affiliateLink": "https://example.com/"},
+         "new-world":  { "wine": "Late Harvest Riesling (USA)", "description": "Almost similar to Germany", "affiliateLink": "https://example.com/"},
+        },
+       "red": {
+         "old-world":  { "wine": "Lambrusco (Sweet) (Emilia-Romagna, Italy)", "description": "Light and slightly sparkling, with fruity notes of cherry and raspberry that can balance the tang of citrus desserts.", "affiliateLink": "https://example.com/"},
+         "new-world":  { "wine": "Zinfandel (California, USA)", "description": "A fruity, medium-bodied red that complements the zesty flavors of lemon or orange cakes.", "affiliateLink": "https://example.com/"},
+        },
+      },
+      "cheesedessert":{ 
+        "dessert": {
+         "old-world":  { "wine": "Port (Tawny or Ruby) (Porto, Portugal)", "description": "Ideal for pairing with blue cheese and creamy cheesecakes, thanks to their rich, fruity flavors.", "affiliateLink": "https://example.com/"},
+        },
+        "white": {
+         "old-world":  { "wine": "Sauternes (Bordeaux, France)", "description": "The richness and sweetness complement the creaminess of cheesecake, especially with fruit toppings.", "affiliateLink": "https://example.com/"},
+        },
+       "red": {
+         "old-world":  { "wine": "Pinot Noir (Burgundy, France)", "description": "Light and fresh, its berry notes pair well with creamy cheeses like cheesecake. Almost similar to Oregon, USA.", "affiliateLink": "https://example.com/"},
+         "new-world":  { "wine": "Cabernet Sauvignon (Napa Valley, USA)", "description": "Full-bodied and tannic, it’s a good match for rich, creamy desserts and strong cheeses. Almost similar to Bordeaux, France.", "affiliateLink": "https://example.com/"},
+        },
+      },
+      "light":{ 
+        "dessert": {
+         "old-world":  { "wine": "Muscat Beaumes-de-Venise (Beaumes-de-Venise, France)", "description": " Sweet, fruity, and floral, ideal for pairing with light, fruity desserts or sorbets.", "affiliateLink": "https://example.com/"},
+        },  
+        "sparkling": {
+         "old-world":  { "wine": "Moscato d'Asti (Piedmont, Italy)", "description": "Light, refreshing, and slightly sparkling, it pairs perfectly with light, refreshing desserts.", "affiliateLink": "https://example.com/"},
+        },
+        "white": {
+         "old-world":  { "wine": "Late Harvest Riesling (Germany) ", "description": "Sweet and crisp, with apricot and honey notes that enhance light desserts like fruit sorbets.", "affiliateLink": "https://example.com/"},
+         "new-world":  { "wine": "Late Harvest Riesling (USA) ", "description": "Almost similar to Germany ", "affiliateLink": "https://example.com/"},
+        },
+       "red": {
+         "old-world":  { "wine": "Lambrusco (Emilia-Romagna, Italy)", "description": "Slightly sparkling and light, this wine is perfect for light, fruity desserts.", "affiliateLink": "https://example.com/"},
+         "new-world":  { "wine": "Pinot Noir (Oregon, USA)", "description": "Light and fruity, it works wonderfully with fruit salads or sponge cakes with berries. Almost similar to Burgundy, France.", "affiliateLink": "https://example.com/"},
+        },
+      },
+    },
+    "prime": {
+      "prime":{ 
+        "rosé": {
+         "old-world":  { "wine": " ", "description": " ", "affiliateLink": "https://example.com/"},
+         "new-world":  { "wine": " ", "description": " ", "affiliateLink": "https://example.com/"},
+        },
+        "white": {
+         "old-world":  { "wine": " ", "description": " ", "affiliateLink": "https://example.com/"},
+         "new-world":  { "wine": " ", "description": " ", "affiliateLink": "https://example.com/"},
+        },
+       "red": {
+         "old-world":  { "wine": " ", "description": " ", "affiliateLink": "https://example.com/"},
+         "new-world":  { "wine": " ", "description": " ", "affiliateLink": "https://example.com/"},
+        }
+        
+      }}}
+  
+// Function to update displayed options based on food input
+function updateFoodOptions() {
+    const foodInput = document.getElementById("food-input").value.trim().toLowerCase();
+    const pastaContainer = document.getElementById("pasta-sauce-container");
+    const chickenContainer = document.getElementById("chicken-container");
+    const cheeseContainer = document.getElementById("cheese-container");
+    const fishContainer = document.getElementById("fish-container");
+    const donenessContainer = document.getElementById("doneness-container");
+    const lambContainer = document.getElementById("lamb-container");
+    const beefContainer = document.getElementById("beef-container");
+    const porkContainer = document.getElementById("pork-container");
+    const gameContainer = document.getElementById("game-container");
+    const dessertContainer = document.getElementById("dessert-container");
+
+     // Hide all containers initially
+    pastaContainer.style.display = "none";
+    chickenContainer.style.display = "none";
+    cheeseContainer.style.display = "none";
+    fishContainer.style.display = "none";
+    donenessContainer.style.display = "none";
+    lambContainer.style.display = "none";
+    beefContainer.style.display = "none";
+    porkContainer.style.display = "none";
+    gameContainer.style.display = "none";
+    dessertContainer.style.display = "none";
+
+    // Show relevant containers based on the food input (case insensitive and partial match)
+    if (foodInput.includes("pasta")) {
+        pastaContainer.style.display = "block";
+    } else if (foodInput.includes("chicken")) {
+        chickenContainer.style.display = "block";
+    } else if (foodInput.includes("cheese")) {
+        cheeseContainer.style.display = "block";
+    } else if (foodInput.includes("fish")) {
+        fishContainer.style.display = "block";
+    } else if (foodInput.includes("game")) {
+        gameContainer.style.display = "block";
+    } else if (foodInput.includes("pork")) {
+        porkContainer.style.display = "block";
+    } else if (foodInput.includes("lamb")) {
+        lambContainer.style.display = "block";
+    } else if (foodInput.includes("beef")) {
+        beefContainer.style.display = "block";
+    } else if (foodInput.includes("steak")) {
+        donenessContainer.style.display = "block";
+    } else if (foodInput.includes("dessert")) {
+        dessertContainer.style.display = "block";
+    }
+  }
+// Function to find and display wine pairing based on selections
+function findPairing() {
+    const foodInput = document.getElementById("food-input").value.trim().toLowerCase();
+    const pastaSauce = document.getElementById("pasta-sauce") ? document.getElementById("pasta-sauce").value.trim().toLowerCase() : "";
+    const cheeseType = document.getElementById("cheese-type") ? document.getElementById("cheese-type").value.trim().toLowerCase() : "";
+    const chickenType = document.getElementById("chicken-type") ? document.getElementById("chicken-type").value.trim().toLowerCase() : "";
+    const fishType = document.getElementById("fish-type") ? document.getElementById("fish-type").value.trim().toLowerCase() : "";
+    const porkType = document.getElementById("pork-type") ? document.getElementById("pork-type").value.trim().toLowerCase() : "";
+    const beefType = document.getElementById("beef-type") ? document.getElementById("beef-type").value.trim().toLowerCase() : "";
+    const lambType = document.getElementById("lamb-type") ? document.getElementById("lamb-type").value.trim().toLowerCase() : "";
+    const donenessType = document.getElementById("doneness-type") ? document.getElementById("doneness-type").value.trim().toLowerCase() : "";
+    const gameType = document.getElementById("game-type") ? document.getElementById("game-type").value.trim().toLowerCase() : "";
+    const dessertType = document.getElementById("dessert-type") ? document.getElementById("dessert-type").value.trim().toLowerCase() : "";
+    const wineType = document.getElementById("wine-type").value.trim().toLowerCase();
+    const wineRegion = document.getElementById("wine-region").value.trim().toLowerCase();
+    const resultContainer = document.getElementById("pairing-result");
+
+    let pairing = null;
+
+    // Check pairing for food and wine selections
+    if (foodInput === "pasta") {
+        if (pairings["pasta"][pastaSauce]) {
+            pairing = pairings["pasta"][pastaSauce][wineType]?.[wineRegion];
+        }
+    } else if (foodInput === "chicken") {
+        if (pairings["chicken"][chickenType]) {
+            pairing = pairings["chicken"][chickenType][wineType]?.[wineRegion];
+        }
+    } else if (foodInput === "fish") {
+        if (pairings["fish"][fishType]) {
+            pairing = pairings["fish"][fishType][wineType]?.[wineRegion];
+        }
+    } else if (foodInput === "pork") {
+        if (pairings["pork"][porkType]) {
+            pairing = pairings["pork"][porkType][wineType]?.[wineRegion];
+        }
+    } else if (foodInput === "cheese") {
+        if (pairings["cheese"][cheeseType]) {
+            pairing = pairings["cheese"][cheeseType][wineType]?.[wineRegion];
+        }
+    } else if (foodInput === "lamb") {
+        if (pairings["lamb"][lambType]) {
+            pairing = pairings["lamb"][lambType][wineType]?.[wineRegion];
+        }
+    } else if (foodInput === "beef") {
+        if (pairings["beef"][beefType]) {
+            pairing = pairings["beef"][beefType][wineType]?.[wineRegion];
+        }
+    } else if (foodInput === "game") {
+        if (pairings["game"][gameType]) {
+            pairing = pairings["game"][gameType][wineType]?.[wineRegion];
+        }
+    } else if (foodInput === "steak") {
+        if (pairings["steak"][donenessType]) {
+            pairing = pairings["steak"][donenessType][wineType]?.[wineRegion];
+        }
+    }
+      else if (foodInput === "dessert") {
+        if (pairings["dessert"][dessertType]) {
+            pairing = pairings["dessert"][dessertType][wineType]?.[wineRegion];
+        }
+    }
+
+    // Display pairing result
+    if (pairing  && pairing.wine) {
+        resultContainer.innerHTML = `
+            <h3>Recommended Wine : ${pairing.wine}</h3>
+            <p>${pairing.description}</p>
+            <aERROR.HERE href="${pairing.affiliateLink}" target="_blank" class="buy-link">No link yet</a>
+        `;
+    } else {
+        resultContainer.innerHTML = `<p>Currently, no wine has been assigned for the selected preferences. </p>
+        <p> Please adjust your wine type selection.</p>`;
+    }
+}
+
+// Function to save favorite pairing to localStorage
+function saveFavorite() {
+    const foodInput = document.getElementById("food-input").value;
+    const wineLink = document.querySelector(".buy-link");
+    const wine = wineLink ? wineLink.textContent : "No wine found";
+    localStorage.setItem(
+        "favoritePairing",
+        JSON.stringify({ food: foodInput, wine: wine })
+    );
+    alert("Pairing saved to your favorites!");
+   }
+function socialShare(platform) {
+      // Log to console which button was clicked
+      console.log(`${platform} share button clicked!`);
+
+      // You can add additional functionality here, such as tracking analytics or sending events.
+      // For now, this simply logs to the console.
+    }
+  </script>
+   <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.13.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.13.1/firebase-database.js"></script>  
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-ZZKKNRNRNJ"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-ZZKKNRNRNJ');
+  </script>
+  
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+ 
+</body>
+</html>
