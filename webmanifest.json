@@ -1,0 +1,26 @@
+{
+  "short_name": "Jerry's F&W",
+  "name": "Jerry's Food & Wine Pairing App",
+  "description": "A web app to help you pair wines with food",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#000000",
+  "icons": [
+    {
+      "src": "https://cdn.glitch.global/a1542506-b096-4700-ba35-f7cd2852e4fd/web-app-manifest-512x512.png?v=1733850949294",
+      "sizes": "512x512",
+      "type": "image/png"
+    },
+    {
+      "src": "https://cdn.glitch.global/a1542506-b096-4700-ba35-f7cd2852e4fd/favicon-96x96.png?v=1733850924962",
+      "sizes": "96x96",
+      "type": "image/png"
+    },
+    {
+      "src": "https://cdn.glitch.global/a1542506-b096-4700-ba35-f7cd2852e4fd/apple-touch-icon.png?v=1733850961156",
+      "sizes": "180x180",
+      "type": "image/png"
+    }
+  ]
+}
