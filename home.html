@@ -2981,7 +2981,30 @@ function socialShare(platform) {
 
     gtag('config', 'G-ZZKKNRNRNJ');
   </script>
-  
+    
+   <script>
+    const CACHE_NAME = 'offline-cache-v1';
+    const ASSETS = ['/', '/index.html', '/styles.css', '/main.js'];
+
+    self.addEventListener('install', (event) => {
+    event.waitUntil(
+       caches.open(CACHE_NAME).then(cache => cache.addAll(ASSETS))
+     );
+   });
+
+    self.addEventListener('fetch', (event) => {
+    event.respondWith(
+      caches.match(event.request).then(resp => resp || fetch(event.request))
+     );
+   });
+
+    if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/sw.js')
+      .then(() => console.log('Service Worker Registered'))
+      .catch(err => console.error('SW registration failed:', err));
+   }
+  </script>
+
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
  
 </body>
