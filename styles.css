@@ -219,7 +219,7 @@
       border-radius: 5px;
     }
     /* Search And Find */
-    .accept-button, button {
+    button {
       padding: 10px 20px;
       font-size: 1.2em;
       background-color: rgb(116, 3, 3);
@@ -275,8 +275,8 @@
       background-color: rgba(255, 255, 255, 0.4); 
     }
 
-    .buy-link:hover {
-      background-color: #4bb650;
+    .accept-button, .buy-link:hover {
+      background-color: rgb(116, 3, 3);
     }    
     /* Link styling */
     .red-link {
