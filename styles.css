@@ -219,7 +219,7 @@
       border-radius: 5px;
     }
     /* Search And Find */
-    button {
+    .accept-button, button {
       padding: 10px 20px;
       font-size: 1.2em;
       background-color: rgb(116, 3, 3);
@@ -261,9 +261,7 @@
       margin-top: 50px;
       font-size: 0.9em;
     }
-    
-    /* Accept button styling */
-    .accept-button,.buy-link {
+    .buy-link {
       padding: 10px 20px;
       background-color: rgba(255, 255, 255, 0.2); 
       color: white;
