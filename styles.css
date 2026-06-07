@@ -140,15 +140,7 @@
       color: #960707;
     }
       /* Image */
-    header {
-      display: flex;
-      background-image: url();
-      background-size: cover;
-      background-position: center;
-      border-radius: 8px;
-      height: 60px;
-      margin: 20px;
-    }
+  
     /* Feature Guide Button */
     .dropdown-btn {
       background-color: rgba(255, 255, 255, 0.2); /* Transparent background */
